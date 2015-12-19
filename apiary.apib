@@ -1,0 +1,247 @@
+FORMAT: 1A
+HOST: http://gogame.apiblueprint.org/
+
+# Go Game
+
+This is a simple API for a small game server handling the game of Go. For the rules used as a reference when building this application,
+see [The Rules of Go](https://en.wikipedia.org/wiki/Rules_of_go)
+
+# Group Matches
+
+A match is the unit of active gameplay within Go. Each match is assigned a unique GUID upon creation, and all references to the match
+via this API are thereafter keyed by the match ID.
+
+## Matches Collection [/matches]
+
+The matches collection represents the matches currently ongoing being handled by the server at the time. It does not cover historical access to old game records.
+
+### List All Matches [GET]
+
+Lists all currently active matches on the server. 
+
++ Response 200 (application/json)
+
+        [
+            {
+                "id" : "5a003b78-409e-4452-b456-a6f0dcee05bd",
+                "started_at": "2015-08-05T08:40:51.620Z",
+                "turn" : 27,
+                "gridsize" : 19,
+                "players" : [
+                    {
+                        "color" : "white",
+                        "name" : "bob",
+                        "score" : 10,
+                    },
+                    {
+                        "color" : "black",
+                        "name" : "alfred",
+                        "score" : 22,
+                    }
+                ]
+            }
+        ]
+
+### Start a New Match [POST]
+
+You can create a new match with this action. It takes information about the players and will set up a new game. The game will start at round 1, and it will be **black**'s turn to
+play. Per standard Go rules, **black** plays first.
+
++ Request (application/json)
+
+        {
+            "gridsize" : 19,
+            "players" : [
+            {
+                "color" : "white",
+                "name" : "bob"
+            },
+            {
+                "color" : "black",
+                "name" : "alfred"
+            }
+            ]
+        }
+
++ Response 201 (application/json)
+
+    + Headers
+
+            Location: /matches/5a003b78-409e-4452-b456-a6f0dcee05bd
+
+    + Body
+
+            {
+                "id" : "5a003b78-409e-4452-b456-a6f0dcee05bd",
+                "started_at": "2015-08-05T08:40:51.620Z",
+                "gridsize" : 19,
+                "turn" : 0,
+                "players" : [
+                    {
+                        "color" : "white",
+                        "name" : "bob",
+                        "score" : 10
+                    },
+                    {
+                        "color" : "black",
+                        "name" : "alfred",
+                        "score" : 22
+                    }
+                ]
+                
+            }
+
+## Match Status [/matches/{match_id}]
+
+Use the match status resource to interrogate various aspects of an individual running match.
+
++ Parameters
+
+    + match_id: `5a003b78-409e-4452-b456-a6f0dcee05bd` (string) - The id of the running match.
+
+            
+### Get Match Details [GET]
+
+Query the details of an ongoing match.
+
++ Response 200 (application/json)
+
+        {
+            "id" : "5a003b78-409e-4452-b456-a6f0dcee05bd",
+            "started_at": "2015-08-05T08:40:51.620Z",
+            "gridsize" : 6,
+            "turn" : 0,
+            "players" : [
+                {
+                    "color" : "white",
+                    "name" : "bob",
+                    "score" : 10
+                },
+                {
+                    "color" : "black",
+                    "name" : "alfred",
+                    "score" : 22
+                }
+            ],
+            "gameboard": [
+                [ 0, 0, 0, 0, 0, 0],
+                [ 0, 1, 2, 0, 0, 0],
+                [ 0, 1, 2, 0, 1, 2],
+                [ 0, 0, 0, 0, 0, 0],
+                [ 0, 0, 0, 0, 0, 0],
+                [ 0, 0, 0, 0, 0, 0]
+            ]
+        }
+        
+### Get Current Liberties for Match [GET /matches/{match_id}/liberties]
+
+Liberties are positions adjacent to a player chain. You might use this resource if your game client implements a hint or cheat functionality that highlights potential positions onto which a player can place a stone.
+
++ Parameters
+
+    + match_id: `5a003b78-409e-4452-b456-a6f0dcee05bd` (string) - The id of the running match.
+
+
++ Response 200 (application/json)
+
+        [
+            {
+                "player" : "white",
+                "position" : {
+                    "x" : 1,
+                    "y" : 2
+                },
+            {
+                "player" : "black",
+                "position" : {
+                    "x" : 2,
+                    "y" : 3
+                }
+            }
+        ]
+
+### Get Current Chains for Match [GET /matches/{match_id}/chains]
+
+A chain is a list of adjacent stones. See Go rules for a definition of adjacent. Note that a single stone can be considered a chain.
+You might want to use this resource if your game client implements handy functionality that might highlight any
+given player's chains to aid them in strategy. 
+
++ Parameters
+
+    + match_id: `5a003b78-409e-4452-b456-a6f0dcee05bd` (string) - The id of the running match.
+
++ Response 200 (application/json)
+
+        [
+            {
+                "player" : "white",
+                "positions": [
+                    { "x": 10, "y": 9 },
+                    { "x": 11, "y": 9 }
+                ]
+            }
+        ]
+
+# Group Moves
+
+A move consists of a single player placing a stone on the board. Players have the option of **passing** on a given turn, in which case the position field may
+be missing or empty, indicating a pass. A turn consists of both players having performed a **move**.
+
+## Moves Collection [/matches/{match_id}/moves]
+This resource is available for interrogating moves within a match, or for players to perform a move.
+
++ Parameters
+
+    + match_id: `5a003b78-409e-4452-b456-a6f0dcee05bd` (string) - The id of the running match.
+
+### Get a Sequential List of All Moves Performed in a Match [GET]
+
+If you need to get a time-ordered list of every position claimed by players in a match, you can use this resource. This might
+be helpful if your game client needs to maintain a UI element that displays the list of moves taken thus far. This only
+works for active matches, and is not intended for historical queries.
+
+
++ Response 200 (application/json)
+
+        [
+            {
+                "player" : "black",
+                "position": { "x": 4, "y", 10 }
+            },
+            {
+                "player" : "white",
+                "position" : { "x" : 3, "y" : 5 }
+            }
+        ]
+
+### Make a Move [POST]
+
+Use this resource to submit a move to the game server. If the move is an illegal move, then the server will reply with a **400** status code, indicating
+a bad request. The reply will contain a message describing the reason for the failed attempt to move. 
+
+Reasons for receiving messages about an illegal move:
+
+* Position is already occupied
+* Position is not one of the player's current liberties
+* After the move would be evaluated and captures evaluated, the move would result in self-capture (suicide)
+* The move would result in a violation of the **superko** rule, which prevents the game board from being put in a state in which it has previously been within this match.
+
+A move containing a position is considered a **play** while a move without a position is considered a **pass**.
+
+Leaving the **position** field empty indicates a pass.
+
++ Request (application/json)
+
+        {
+            "player" : "white",
+            "position" : { "x" : 3, "y" : 10 }
+        }
+        
++ Response 200 (application/json)
+        
++ Response 400 (application/json)
+
+        {
+            "message" : "Invalid move"
+        }
+
