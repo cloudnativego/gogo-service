@@ -46,5 +46,9 @@ func TestCreateMatch(t *testing.T) {
 		t.Errorf("Expected response status 201, received %s", res.Status)
 	}
 
+	if res.Header["Location"] == nil {
+		t.Error("Location header is not set")
+	}
+
 	fmt.Printf("Payload: %s", string(payload))
 }
