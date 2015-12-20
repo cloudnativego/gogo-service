@@ -10,11 +10,6 @@ type newMatchResponse struct {
 	PlayerBlack string `json:"playerBlack"`
 }
 
-type player struct {
-	Color string `json:"color"`
-	Name  string `json:"name"`
-}
-
 type newMatchRequest struct {
 	GridSize    int    `json:"gridsize"`
 	PlayerWhite string `json:"playerWhite"`
