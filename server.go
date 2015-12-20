@@ -17,15 +17,17 @@ func NewServer() *negroni.Negroni {
 
 	n := negroni.Classic()
 	mx := mux.NewRouter()
+	repo := newInMemoryRepository()
 
-	initRoutes(mx, formatter)
+	initRoutes(mx, formatter, repo)
 
 	n.UseHandler(mx)
 	return n
 }
 
-func initRoutes(mx *mux.Router, formatter *render.Render) {
+func initRoutes(mx *mux.Router, formatter *render.Render, repo matchRepository) {
 	mx.HandleFunc("/test", testHandler(formatter)).Methods("GET")
+	mx.HandleFunc("/matches", createMatchHandler(formatter, repo)).Methods("POST")
 }
 
 func testHandler(formatter *render.Render) http.HandlerFunc {

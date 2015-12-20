@@ -1,5 +1,7 @@
 package main
 
+import "github.com/cloudnativego/gogo-engine"
+
 type newMatchResponse struct {
 	Id        string   `json:"id"`
 	StartedAt int64    `json:"started_at"`
@@ -10,4 +12,9 @@ type newMatchResponse struct {
 type player struct {
 	Color string `json:"color"`
 	Name  string `json:"name"`
+}
+
+type matchRepository interface {
+	addMatch(match gogo.Match) (err error)
+	getMatches() []gogo.Match
 }
