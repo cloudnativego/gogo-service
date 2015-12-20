@@ -29,7 +29,6 @@ func TestCreateMatch(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(createMatchHandler(formatter, repo)))
 	defer server.Close()
 
-	//body := []byte("{\n  \"gridsize\": 19,\n  \"players\": [\n    {\n      \"color\": \"white\",\n      \"name\": \"bob\"\n    },\n    {\n      \"color\": \"black\",\n      \"name\": \"alfred\"\n    }\n  ]\n}")
 	body := []byte("{\n  \"gridsize\": 19,\n  \"playerWhite\": \"bob\",\n  \"playerBlack\": \"alfred\"\n}")
 
 	req, err := http.NewRequest("POST", server.URL, bytes.NewBuffer(body))
