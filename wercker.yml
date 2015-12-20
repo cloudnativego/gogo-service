@@ -1,0 +1,43 @@
+box: google/golang
+
+build:
+
+  steps:
+    - setup-go-workspace
+
+    - script:
+        name: go get
+        code: |
+          cd $WERCKER_SOURCE_DIR
+          go version
+          go get -u github.com/tools/godep
+          export PATH=$WERCKER_SOURCE_DIR/bin:$PATH
+
+    # Build the project
+    - script:
+        name: go build
+        code: |
+          godep go build ./...
+
+    # Test the project
+    - script:
+        name: go test
+        code: |
+          godep go test ./...
+
+    - script:
+        name: copy files to wercker output
+        code: |
+          cp -R ./ ${WERCKER_OUTPUT_DIR}
+
+
+deploy:
+ steps:
+   - internal/docker-push:
+       username: $USERNAME
+       password: $PASSWORD
+       cmd: /pipeline/source/gogo-service
+       port: "8080"
+       tag: v1
+       repository: cloudnativego/gogo-service
+       registry: https://registry.hub.docker.com
