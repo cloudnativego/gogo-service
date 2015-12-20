@@ -51,16 +51,8 @@ play. Per standard Go rules, **black** plays first.
 
         {
             "gridsize" : 19,
-            "players" : [
-            {
-                "color" : "white",
-                "name" : "bob"
-            },
-            {
-                "color" : "black",
-                "name" : "alfred"
-            }
-            ]
+            "playerWhite" : "bob",
+            "playerBlack" : "alfred"
         }
 
 + Response 201 (application/json)
