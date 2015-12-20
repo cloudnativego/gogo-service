@@ -3,7 +3,7 @@ package main
 import "github.com/cloudnativego/gogo-engine"
 
 type newMatchResponse struct {
-	Id        string   `json:"id"`
+	ID        string   `json:"id"`
 	StartedAt int64    `json:"started_at"`
 	GridSize  int      `json:"gridsize"`
 	Players   []player `json:"players"`
@@ -12,6 +12,11 @@ type newMatchResponse struct {
 type player struct {
 	Color string `json:"color"`
 	Name  string `json:"name"`
+}
+
+type newMatchRequest struct {
+	GridSize int      `json:"gridsize"`
+	Players  []player `json:"players"`
 }
 
 type matchRepository interface {

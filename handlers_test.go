@@ -9,6 +9,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/cloudnativego/gogo-engine"
 	"github.com/unrolled/render"
 )
 
@@ -70,7 +71,7 @@ func TestCreateMatch(t *testing.T) {
 		t.Errorf("Could not unmarshal payload into newMatchResponse object")
 	}
 
-	if matchResponse.Id == "" || !strings.Contains(loc[0], matchResponse.Id) {
+	if matchResponse.ID == "" || !strings.Contains(loc[0], matchResponse.ID) {
 		t.Error("matchResponse.Id does not match Location header")
 	}
 
@@ -80,4 +81,9 @@ func TestCreateMatch(t *testing.T) {
 		t.Errorf("Expected a match repo of 1 match, got size %d", len(matches))
 	}
 
+	var match gogo.Match
+	match = matches[0]
+	if match.GridSize != matchResponse.GridSize {
+		t.Errorf("Expected repo match and HTTP response gridsize to match. Got %d and %d", match.GridSize, matchResponse.GridSize)
+	}
 }
