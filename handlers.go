@@ -16,9 +16,9 @@ func createMatchHandler(formatter *render.Render, repo matchRepository) http.Han
 		var newMatchRequest newMatchRequest
 		json.Unmarshal(payload, &newMatchRequest)
 
-		newMatch := gogo.NewMatch(newMatchRequest.GridSize)
+		newMatch := gogo.NewMatch(newMatchRequest.GridSize, newMatchRequest.Players[0].Name, newMatchRequest.Players[1].Name)
 		repo.addMatch(newMatch)
 		w.Header().Add("Location", "/matches/"+newMatch.ID)
-		formatter.JSON(w, http.StatusCreated, &newMatchResponse{ID: newMatch.ID, GridSize: newMatch.GridSize})
+		formatter.JSON(w, http.StatusCreated, &newMatchResponse{ID: newMatch.ID, GridSize: newMatch.GridSize, Players: newMatchRequest.Players})
 	}
 }

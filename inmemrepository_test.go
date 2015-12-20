@@ -7,7 +7,7 @@ import (
 )
 
 func TestAddMatchShowsUpInRepository(t *testing.T) {
-	match := gogo.NewMatch(19)
+	match := gogo.NewMatch(19, "bob", "alfred")
 
 	repo := newInMemoryRepository()
 	err := repo.addMatch(match)
@@ -18,6 +18,10 @@ func TestAddMatchShowsUpInRepository(t *testing.T) {
 	matches := repo.getMatches()
 	if len(matches) != 1 {
 		t.Errorf("Expected to have 1 match in the repository, got %d", len(matches))
+	}
+
+	if matches[0].Players[0].Name != "bob" {
+		t.Errorf("Player 1's name should have been bob, got %s", matches[0].Players[0].Name)
 	}
 }
 

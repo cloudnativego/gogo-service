@@ -86,4 +86,20 @@ func TestCreateMatch(t *testing.T) {
 	if match.GridSize != matchResponse.GridSize {
 		t.Errorf("Expected repo match and HTTP response gridsize to match. Got %d and %d", match.GridSize, matchResponse.GridSize)
 	}
+
+	if len(matchResponse.Players) != 2 {
+		t.Errorf("Match response from server should indicate two players, got %d", len(matchResponse.Players))
+	}
+
+	for _, player := range matchResponse.Players {
+		if player.Name == "alfred" {
+			if player.Color != "black" {
+				t.Errorf("Alfred's color should have been black, got %s", player.Color)
+			}
+		} else if player.Name == "bob" {
+			if player.Color != "white" {
+				t.Errorf("Bob's color should be white, got %s", player.Color)
+			}
+		}
+	}
 }
