@@ -29,7 +29,8 @@ func TestCreateMatch(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(createMatchHandler(formatter, repo)))
 	defer server.Close()
 
-	body := []byte("{\n  \"gridsize\": 19,\n  \"players\": [\n    {\n      \"color\": \"white\",\n      \"name\": \"bob\"\n    },\n    {\n      \"color\": \"black\",\n      \"name\": \"alfred\"\n    }\n  ]\n}")
+	//body := []byte("{\n  \"gridsize\": 19,\n  \"players\": [\n    {\n      \"color\": \"white\",\n      \"name\": \"bob\"\n    },\n    {\n      \"color\": \"black\",\n      \"name\": \"alfred\"\n    }\n  ]\n}")
+	body := []byte("{\n  \"gridsize\": 19,\n  \"playerWhite\": \"bob\",\n  \"playerBlack\": \"alfred\"\n}")
 
 	req, err := http.NewRequest("POST", server.URL, bytes.NewBuffer(body))
 	if err != nil {
@@ -87,19 +88,11 @@ func TestCreateMatch(t *testing.T) {
 		t.Errorf("Expected repo match and HTTP response gridsize to match. Got %d and %d", match.GridSize, matchResponse.GridSize)
 	}
 
-	if len(matchResponse.Players) != 2 {
-		t.Errorf("Match response from server should indicate two players, got %d", len(matchResponse.Players))
+	if matchResponse.PlayerWhite != "bob" {
+		t.Errorf("Expected white player to be bob, got %s", matchResponse.PlayerWhite)
 	}
 
-	for _, player := range matchResponse.Players {
-		if player.Name == "alfred" {
-			if player.Color != "black" {
-				t.Errorf("Alfred's color should have been black, got %s", player.Color)
-			}
-		} else if player.Name == "bob" {
-			if player.Color != "white" {
-				t.Errorf("Bob's color should be white, got %s", player.Color)
-			}
-		}
+	if matchResponse.PlayerBlack != "alfred" {
+		t.Errorf("Expected black player to be alfred, got %s", matchResponse.PlayerBlack)
 	}
 }
