@@ -88,6 +88,10 @@ func TestCreateMatch(t *testing.T) {
 		t.Errorf("Expected repo match and HTTP response gridsize to match. Got %d and %d", match.GridSize, matchResponse.GridSize)
 	}
 
+	if match.PlayerWhite != "bob" {
+		t.Errorf("Repository match, white player should be bob, got %s", match.PlayerWhite)
+	}
+
 	if matchResponse.PlayerWhite != "bob" {
 		t.Errorf("Expected white player to be bob, got %s", matchResponse.PlayerWhite)
 	}
