@@ -20,3 +20,17 @@ type matchRepository interface {
 	addMatch(match gogo.Match) (err error)
 	getMatches() []gogo.Match
 }
+
+func (request newMatchRequest) isValid() (valid bool) {
+	valid = true
+	if request.GridSize != 19 && request.GridSize != 13 && request.GridSize != 9 {
+		valid = false
+	}
+	if request.PlayerWhite == "" {
+		valid = false
+	}
+	if request.PlayerBlack == "" {
+		valid = false
+	}
+	return valid
+}
