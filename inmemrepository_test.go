@@ -28,6 +28,25 @@ func TestAddMatchShowsUpInRepository(t *testing.T) {
 	}
 }
 
+func TestGetMatchRetrievesProperMatch(t *testing.T) {
+	match := gogo.NewMatch(19, "bob", "alfred")
+
+	repo := newInMemoryRepository()
+	err := repo.addMatch(match)
+	if err != nil {
+		t.Error("Got an error adding a match to repository, should not have.")
+	}
+
+	target, err := repo.getMatch(match.ID)
+	if err != nil {
+		t.Errorf("Got an error when retrieving match from repo instead of success. Err: %s", err.Error())
+	}
+
+	if target.GridSize != 19 {
+		t.Errorf("Got the wrong gridsize. Expected 19, got %d", target.GridSize)
+	}
+}
+
 func TestNewRepositoryIsEmpty(t *testing.T) {
 	repo := newInMemoryRepository()
 

@@ -50,5 +50,11 @@ func getMatchDetailsHandler(formatter *render.Render, repo matchRepository) http
 		vars := mux.Vars(req)
 		matchID := vars["id"]
 		fmt.Printf("Fetching match details for match (%s)\n", matchID)
+		_, err := repo.getMatch(matchID)
+		if err != nil {
+			formatter.JSON(w, http.StatusNotFound, err.Error())
+		} else {
+			formatter.JSON(w, http.StatusOK, matchDetailsResponse{})
+		}
 	}
 }

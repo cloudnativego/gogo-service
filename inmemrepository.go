@@ -1,6 +1,11 @@
 package main
 
-import "github.com/cloudnativego/gogo-engine"
+import (
+	"errors"
+	"strings"
+
+	"github.com/cloudnativego/gogo-engine"
+)
 
 type inMemoryMatchRepository struct {
 	matches []gogo.Match
@@ -23,5 +28,15 @@ func (repo *inMemoryMatchRepository) getMatches() []gogo.Match {
 }
 
 func (repo *inMemoryMatchRepository) getMatch(id string) (match gogo.Match, err error) {
+	found := false
+	for _, target := range repo.matches {
+		if strings.Compare(target.ID, id) == 0 {
+			match = target
+			found = true
+		}
+	}
+	if !found {
+		err = errors.New("Could not find match in repository")
+	}
 	return match, err
 }
