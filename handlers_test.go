@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/cloudnativego/gogo-engine"
+	"github.com/codegangsta/negroni"
 	"github.com/unrolled/render"
 )
 
@@ -216,6 +217,18 @@ func TestGetMatchListReturnsWhatsInRepository(t *testing.T) {
 }
 
 func TestGetMatchDetailsReturns404ForNonexistentMatch(t *testing.T) {
-	// TODO implement
-	t.Errorf("Not yet implemented")
+	var (
+		server   *negroni.Negroni
+		request  *http.Request
+		recorder *httptest.ResponseRecorder
+	)
+
+	server = NewServer()
+	recorder = httptest.NewRecorder()
+	request, _ = http.NewRequest("GET", "/matches/1234", nil)
+	server.ServeHTTP(recorder, request)
+
+	if recorder.Code != http.StatusNotFound {
+		t.Errorf("Expected %v; received %v", http.StatusNotFound, recorder.Code)
+	}
 }
