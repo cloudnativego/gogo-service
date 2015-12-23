@@ -136,3 +136,82 @@ func TestCreateMatch(t *testing.T) {
 		t.Errorf("Expected black player to be alfred, got %s", matchResponse.PlayerBlack)
 	}
 }
+
+func TestGetMatchListReturnsEmptyArrayForNoMatches(t *testing.T) {
+	client := &http.Client{}
+	repo := newInMemoryRepository()
+	server := httptest.NewServer(http.HandlerFunc(getMatchListHandler(formatter, repo)))
+	defer server.Close()
+	req, _ := http.NewRequest("GET", server.URL, nil)
+
+	resp, err := client.Do(req)
+
+	if err != nil {
+		t.Error("Errored when sending request to the server", err)
+		return
+	}
+
+	defer resp.Body.Close()
+	payload, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		t.Error("Failed to read response from server", err)
+	}
+
+	var matchList []newMatchResponse
+	err = json.Unmarshal(payload, &matchList)
+	if err != nil {
+		t.Errorf("Could not unmarshal payload into []newMatchResponse slice")
+	}
+
+	if len(matchList) != 0 {
+		t.Errorf("Expected an empty list of match responses, got %d", len(matchList))
+	}
+}
+
+func TestGetMatchListReturnsWhatsInRepository(t *testing.T) {
+	client := &http.Client{}
+	repo := newInMemoryRepository()
+	repo.addMatch(gogo.NewMatch(19, "black", "white"))
+	repo.addMatch(gogo.NewMatch(13, "bl", "wh"))
+	repo.addMatch(gogo.NewMatch(19, "b", "w"))
+	server := httptest.NewServer(http.HandlerFunc(getMatchListHandler(formatter, repo)))
+	defer server.Close()
+	req, _ := http.NewRequest("GET", server.URL, nil)
+
+	resp, err := client.Do(req)
+
+	if err != nil {
+		t.Error("Errored when sending request to the server", err)
+		return
+	}
+
+	defer resp.Body.Close()
+	payload, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		t.Error("Failed to read response from server", err)
+	}
+
+	var matchList []newMatchResponse
+	err = json.Unmarshal(payload, &matchList)
+	if err != nil {
+		t.Errorf("Could not unmarshal payload into []newMatchResponse slice")
+	}
+
+	repoMatches := repo.getMatches()
+	if len(matchList) != len(repoMatches) {
+		t.Errorf("Match response size should have equaled repo size, sizes were: %d and %d", len(matchList), len(repoMatches))
+	}
+
+	for idx := 0; idx < 3; idx++ {
+		if matchList[idx].GridSize != repoMatches[idx].GridSize {
+			t.Errorf("Gridsize mismatch at index %d. Got %d and %d", idx, matchList[idx].GridSize, repoMatches[idx].GridSize)
+		}
+		if matchList[idx].PlayerBlack != matchList[idx].PlayerBlack {
+			t.Errorf("PlayerBlack mismatch at index %d. Got %s and %s", idx, matchList[idx].PlayerBlack, repoMatches[idx].PlayerBlack)
+		}
+		if matchList[idx].PlayerWhite != matchList[idx].PlayerWhite {
+			t.Errorf("PlayerWhite mismatch at index %d. Got %s and %s", idx, matchList[idx].PlayerWhite, repoMatches[idx].PlayerWhite)
+		}
+	}
+
+}
