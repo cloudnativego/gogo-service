@@ -2,10 +2,12 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 
 	"github.com/cloudnativego/gogo-engine"
+	"github.com/gorilla/mux"
 	"github.com/unrolled/render"
 )
 
@@ -40,5 +42,13 @@ func getMatchListHandler(formatter *render.Render, repo matchRepository) http.Ha
 			matches[idx] = newMatchResponse{ID: match.ID, GridSize: match.GridSize, PlayerBlack: match.PlayerBlack, PlayerWhite: match.PlayerWhite}
 		}
 		formatter.JSON(w, http.StatusOK, matches)
+	}
+}
+
+func getMatchDetailsHandler(formatter *render.Render, repo matchRepository) http.HandlerFunc {
+	return func(w http.ResponseWriter, req *http.Request) {
+		vars := mux.Vars(req)
+		matchID := vars["id"]
+		fmt.Printf("Fetching match details for match (%s)\n", matchID)
 	}
 }

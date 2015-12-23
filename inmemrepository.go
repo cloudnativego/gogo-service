@@ -21,3 +21,7 @@ func (repo *inMemoryMatchRepository) addMatch(match gogo.Match) (err error) {
 func (repo *inMemoryMatchRepository) getMatches() []gogo.Match {
 	return repo.matches
 }
+
+func (repo *inMemoryMatchRepository) getMatch(id string) (match gogo.Match, err error) {
+	return match, err
+}

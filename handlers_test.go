@@ -213,5 +213,9 @@ func TestGetMatchListReturnsWhatsInRepository(t *testing.T) {
 			t.Errorf("PlayerWhite mismatch at index %d. Got %s and %s", idx, matchList[idx].PlayerWhite, repoMatches[idx].PlayerWhite)
 		}
 	}
+}
 
+func TestGetMatchDetailsReturns404ForNonexistentMatch(t *testing.T) {
+	// TODO implement
+	t.Errorf("Not yet implemented")
 }

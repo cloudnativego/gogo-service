@@ -28,6 +28,8 @@ func NewServer() *negroni.Negroni {
 func initRoutes(mx *mux.Router, formatter *render.Render, repo matchRepository) {
 	mx.HandleFunc("/test", testHandler(formatter)).Methods("GET")
 	mx.HandleFunc("/matches", createMatchHandler(formatter, repo)).Methods("POST")
+	mx.HandleFunc("/matches", getMatchListHandler(formatter, repo)).Methods("GET")
+	mx.HandleFunc("/matches/{id}", getMatchDetailsHandler(formatter, repo)).Methods("GET")
 }
 
 func testHandler(formatter *render.Render) http.HandlerFunc {
