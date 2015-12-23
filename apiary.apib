@@ -24,21 +24,11 @@ Lists all currently active matches on the server.
         [
             {
                 "id" : "5a003b78-409e-4452-b456-a6f0dcee05bd",
-                "started_at": "2015-08-05T08:40:51.620Z",
+                "started_at": 13231239123391,
                 "turn" : 27,
                 "gridsize" : 19,
-                "players" : [
-                    {
-                        "color" : "white",
-                        "name" : "bob",
-                        "score" : 10,
-                    },
-                    {
-                        "color" : "black",
-                        "name" : "alfred",
-                        "score" : 22,
-                    }
-                ]
+                "playerWhite" : "bob",
+                "playerBlack" : "alfred"
             }
         ]
 
@@ -88,21 +78,11 @@ Query the details of an ongoing match.
 
         {
             "id" : "5a003b78-409e-4452-b456-a6f0dcee05bd",
-            "started_at": "2015-08-05T08:40:51.620Z",
+            "started_at": 13231239123391,
             "gridsize" : 6,
             "turn" : 0,
-            "players" : [
-                {
-                    "color" : "white",
-                    "name" : "bob",
-                    "score" : 10
-                },
-                {
-                    "color" : "black",
-                    "name" : "alfred",
-                    "score" : 22
-                }
-            ],
+            "playerWhite" : "bob",
+            "playerBlack" : "alice",
             "gameboard": [
                 [ 0, 0, 0, 0, 0, 0],
                 [ 0, 1, 2, 0, 0, 0],
