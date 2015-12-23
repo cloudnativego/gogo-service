@@ -219,21 +219,12 @@ func TestGetMatchListReturnsWhatsInRepository(t *testing.T) {
 
 func TestGetMatchDetailsReturns404ForNonexistentMatch(t *testing.T) {
 	var (
-		server   *negroni.Negroni
 		request  *http.Request
 		recorder *httptest.ResponseRecorder
 	)
 
-	formatter := render.New(render.Options{
-		IndentJSON: true,
-	})
-
-	server = negroni.Classic()
-	mx := mux.NewRouter()
 	repo := newInMemoryRepository()
-	initRoutes(mx, formatter, repo)
-	server.UseHandler(mx)
-
+	server := MakeTestServer(repo)
 	recorder = httptest.NewRecorder()
 	request, _ = http.NewRequest("GET", "/matches/1234", nil)
 	server.ServeHTTP(recorder, request)
@@ -245,23 +236,16 @@ func TestGetMatchDetailsReturns404ForNonexistentMatch(t *testing.T) {
 
 func TestGetMatchDetailsReturns200ForExistingMatch(t *testing.T) {
 	var (
-		server   *negroni.Negroni
 		request  *http.Request
 		recorder *httptest.ResponseRecorder
 	)
 
-	formatter := render.New(render.Options{
-		IndentJSON: true,
-	})
-
-	server = negroni.Classic()
-	mx := mux.NewRouter()
 	repo := newInMemoryRepository()
+	server := MakeTestServer(repo)
+
 	targetMatch := gogo.NewMatch(19, "black", "white")
 	repo.addMatch(targetMatch)
 	targetMatchID := targetMatch.ID
-	initRoutes(mx, formatter, repo)
-	server.UseHandler(mx)
 
 	recorder = httptest.NewRecorder()
 	request, _ = http.NewRequest("GET", "/matches/"+targetMatchID, nil)
@@ -270,4 +254,12 @@ func TestGetMatchDetailsReturns200ForExistingMatch(t *testing.T) {
 	if recorder.Code != http.StatusOK {
 		t.Errorf("Expected %v; received %v", http.StatusOK, recorder.Code)
 	}
+}
+
+func MakeTestServer(repository matchRepository) *negroni.Negroni {
+	server := negroni.Classic()
+	mx := mux.NewRouter()
+	initRoutes(mx, formatter, repository)
+	server.UseHandler(mx)
+	return server
 }
