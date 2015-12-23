@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -49,7 +48,7 @@ func getMatchDetailsHandler(formatter *render.Render, repo matchRepository) http
 	return func(w http.ResponseWriter, req *http.Request) {
 		vars := mux.Vars(req)
 		matchID := vars["id"]
-		fmt.Printf("Fetching match details for match (%s)\n", matchID)
+		//fmt.Printf("Fetching match details for match (%s)\n", matchID)
 		_, err := repo.getMatch(matchID)
 		if err != nil {
 			formatter.JSON(w, http.StatusNotFound, err.Error())
