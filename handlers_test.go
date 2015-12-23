@@ -257,7 +257,7 @@ func TestGetMatchDetailsReturns200ForExistingMatch(t *testing.T) {
 }
 
 func MakeTestServer(repository matchRepository) *negroni.Negroni {
-	server := negroni.Classic()
+	server := negroni.New() // don't need all the middleware here or logging.
 	mx := mux.NewRouter()
 	initRoutes(mx, formatter, repository)
 	server.UseHandler(mx)
