@@ -193,15 +193,35 @@ Leaving the **position** field empty indicates a pass.
 + Request (application/json)
 
         {
-            "player" : "white",
+            "player" : 2,
             "position" : { "x" : 3, "y" : 10 }
         }
         
-+ Response 200 (application/json)
++ Response 201 (application/json)
+
+         {
+                "id" : "5a003b78-409e-4452-b456-a6f0dcee05bd",
+                "started_at": 13231239123391,
+                "gridsize" : 6,
+                "turn" : 0,
+                "playerWhite" : "bob",
+                "playerBlack" : "alice",
+                "gameboard": [
+                    [ 0, 0, 0, 0, 0, 0],
+                    [ 0, 1, 2, 0, 0, 0],
+                    [ 0, 1, 2, 0, 1, 2],
+                    [ 0, 0, 0, 0, 0, 0],
+                    [ 0, 0, 0, 0, 0, 0],
+                    [ 0, 0, 0, 0, 0, 0]
+                ]
+            }
         
 + Response 400 (application/json)
 
         {
             "message" : "Invalid move"
         }
+
+
++ Response 404
 
