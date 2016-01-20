@@ -4,7 +4,7 @@ import "fmt"
 
 // PerformMove accepts an intent to perform a move, validates it, and returns
 // the corresponding change in match as a new match struct.
-func (gameboard GameBoard) performMove(move Move) (outBoard GameBoard, err error) {
+func (gameboard GameBoard) PerformMove(move Move) (outBoard GameBoard, err error) {
 	//outBoard = NewBoard(cap(gameboard.Positions))
 	outBoard = gameboard.copy()
 

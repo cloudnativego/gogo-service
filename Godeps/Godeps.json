@@ -12,7 +12,7 @@
 		},
 		{
 			"ImportPath": "github.com/cloudnativego/gogo-engine",
-			"Rev": "a5709f04973a8ee5f4faf7a70127b5e2e0fbfb6c"
+			"Rev": "e596d29862182adf42d9bb0713763dea664bea3b"
 		},
 		{
 			"ImportPath": "github.com/codegangsta/negroni",
