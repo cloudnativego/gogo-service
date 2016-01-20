@@ -23,7 +23,7 @@ build:
     - script:
         name: go test
         code: |
-          godep go test ./...
+          godep go test -v ./...
 
     - script:
         name: copy files to wercker output
