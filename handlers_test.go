@@ -256,6 +256,51 @@ func TestGetMatchDetailsReturns200ForExistingMatch(t *testing.T) {
 	}
 }
 
+func TestAddMoveIsReflectedInGameBoard(t *testing.T) {
+	var (
+		request  *http.Request
+		recorder *httptest.ResponseRecorder
+	)
+
+	repo := newInMemoryRepository()
+	server := MakeTestServer(repo)
+	targetMatch := gogo.NewMatch(19, "black", "white")
+	repo.addMatch(targetMatch)
+	targetMatchID := targetMatch.ID
+	recorder = httptest.NewRecorder()
+	body := []byte("{\n  \"player\": \"black\",\n  \"position\": {\n    \"x\": 3,\n    \"y\": 10\n  }\n}")
+	reader := bytes.NewReader(body)
+	request, _ = http.NewRequest("POST", "/matches/"+targetMatchID+"/moves", reader)
+	server.ServeHTTP(recorder, request)
+
+	if recorder.Code != http.StatusCreated {
+		t.Errorf("Expected creation of new move to return 201, got %d", recorder.Code)
+	}
+
+	recorder2 := httptest.NewRecorder()
+	request2, _ := http.NewRequest("GET", "/matches/"+targetMatchID, nil)
+	server.ServeHTTP(recorder2, request2)
+	if recorder2.Code != http.StatusOK {
+		t.Errorf("Should've gotten a 200 querying match details, got %d", recorder.Code)
+	}
+
+	payload := recorder2.Body.Bytes()
+	var matchDetails matchDetailsResponse
+	err := json.Unmarshal(payload, &matchDetails)
+	if err != nil {
+		t.Errorf("Could not unmarshal payload into match details response.")
+	}
+
+	if len(matchDetails.GameBoard[0]) != 19 {
+		t.Errorf("Game board size isn't 19, got %d", len(matchDetails.GameBoard[0]))
+	}
+
+	if matchDetails.GameBoard[3][10] != gogo.PlayerWhite {
+		t.Errorf("Game board did not reflect added move to 3,10. Board: %v", matchDetails.GameBoard)
+	}
+
+}
+
 func MakeTestServer(repository matchRepository) *negroni.Negroni {
 	server := negroni.New() // don't need all the middleware here or logging.
 	mx := mux.NewRouter()

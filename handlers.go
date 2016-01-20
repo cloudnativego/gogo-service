@@ -48,11 +48,25 @@ func getMatchDetailsHandler(formatter *render.Render, repo matchRepository) http
 	return func(w http.ResponseWriter, req *http.Request) {
 		vars := mux.Vars(req)
 		matchID := vars["id"]
-		_, err := repo.getMatch(matchID)
+		match, err := repo.getMatch(matchID)
 		if err != nil {
 			formatter.JSON(w, http.StatusNotFound, err.Error())
 		} else {
-			formatter.JSON(w, http.StatusOK, matchDetailsResponse{})
+			formatter.JSON(w, http.StatusOK, matchDetailsResponse{ID: matchID, GameBoard: match.GameBoard.Positions})
+		}
+	}
+}
+
+func addMoveHandler(formatter *render.Render, repo matchRepository) http.HandlerFunc {
+	return func(w http.ResponseWriter, req *http.Request) {
+		vars := mux.Vars(req)
+		matchID := vars["id"]
+		match, err := repo.getMatch(matchID)
+		if err != nil {
+			formatter.JSON(w, http.StatusNotFound, err.Error())
+		} else {
+			match.GameBoard.Positions[3][10] = gogo.PlayerWhite
+			formatter.JSON(w, http.StatusCreated, matchDetailsResponse{ID: matchID, GameBoard: match.GameBoard.Positions})
 		}
 	}
 }
