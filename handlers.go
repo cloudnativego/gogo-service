@@ -65,7 +65,15 @@ func addMoveHandler(formatter *render.Render, repo matchRepository) http.Handler
 		if err != nil {
 			formatter.JSON(w, http.StatusNotFound, err.Error())
 		} else {
-			match.GameBoard.Positions[3][10] = gogo.PlayerWhite
+			payload, _ := ioutil.ReadAll(req.Body)
+			var moveRequest newMoveRequest
+			err := json.Unmarshal(payload, &moveRequest)
+			newBoard, err := match.GameBoard.PerformMove(gogo.Move{Player: moveRequest.Player, Position: gogo.Coordinate{X: moveRequest.Position.X, Y: moveRequest.Position.Y}})
+			// TODO - this only works because we're using an in-memory repository. A stateless external one
+			// would need another call here to persist changes to the match.
+			if err != nil {
+				match.GameBoard = newBoard
+			}
 			formatter.JSON(w, http.StatusCreated, matchDetailsResponse{ID: matchID, GameBoard: match.GameBoard.Positions})
 		}
 	}

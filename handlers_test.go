@@ -256,6 +256,26 @@ func TestGetMatchDetailsReturns200ForExistingMatch(t *testing.T) {
 	}
 }
 
+func TestCannotMakeMoveOnNonExistentgame(t *testing.T) {
+	var (
+		request  *http.Request
+		recorder *httptest.ResponseRecorder
+	)
+
+	repo := newInMemoryRepository()
+	server := MakeTestServer(repo)
+	targetMatchID := "nevergonnahappen"
+
+	recorder = httptest.NewRecorder()
+	body := []byte("{\n  \"player\": 2,\n  \"position\": {\n    \"x\": 3,\n    \"y\": 10\n  }\n}")
+	reader := bytes.NewReader(body)
+	request, _ = http.NewRequest("POST", "/matches/"+targetMatchID+"/moves", reader)
+	server.ServeHTTP(recorder, request)
+	if recorder.Code != 404 {
+		t.Errorf("Should have returned a 404 for a missing match, but got %d instead.", recorder.Code)
+	}
+}
+
 func TestAddMoveIsReflectedInGameBoard(t *testing.T) {
 	var (
 		request  *http.Request
@@ -268,7 +288,7 @@ func TestAddMoveIsReflectedInGameBoard(t *testing.T) {
 	repo.addMatch(targetMatch)
 	targetMatchID := targetMatch.ID
 	recorder = httptest.NewRecorder()
-	body := []byte("{\n  \"player\": \"black\",\n  \"position\": {\n    \"x\": 3,\n    \"y\": 10\n  }\n}")
+	body := []byte("{\n  \"player\": 2,\n  \"position\": {\n    \"x\": 3,\n    \"y\": 10\n  }\n}")
 	reader := bytes.NewReader(body)
 	request, _ = http.NewRequest("POST", "/matches/"+targetMatchID+"/moves", reader)
 	server.ServeHTTP(recorder, request)
@@ -299,6 +319,24 @@ func TestAddMoveIsReflectedInGameBoard(t *testing.T) {
 		t.Errorf("Game board did not reflect added move to 3,10. Board: %v", matchDetails.GameBoard)
 	}
 
+	recorder3 := httptest.NewRecorder()
+	body2 := []byte("{\n  \"player\": 1,\n  \"position\": {\n    \"x\": 8,\n    \"y\": 8\n  }\n}")
+	reader2 := bytes.NewReader(body2)
+	request3, _ := http.NewRequest("POST", "/matches/"+targetMatchID+"/moves", reader2)
+	server.ServeHTTP(recorder3, request3)
+	if recorder3.Code != http.StatusCreated {
+		t.Errorf("Expected 201(Created) for 2nd move, got %d", recorder3.Code)
+	}
+
+	payload = recorder3.Body.Bytes()
+	var matchDetails2 matchDetailsResponse
+	err = json.Unmarshal(payload, &matchDetails2)
+	if err != nil {
+		t.Errorf("Could not unmarshal response for 2nd move add, %s", err.Error())
+	}
+	if matchDetails2.GameBoard[8][8] != gogo.PlayerBlack {
+		t.Errorf("Added move should belong to black at 8,8 - belongs to %d", matchDetails2.GameBoard[8][8])
+	}
 }
 
 func MakeTestServer(repository matchRepository) *negroni.Negroni {

@@ -33,7 +33,7 @@ type boardPosition struct {
 }
 
 type newMoveRequest struct {
-	Player   string        `json:"player"`
+	Player   byte          `json:"player"`
 	Position boardPosition `json:"position"`
 }
 

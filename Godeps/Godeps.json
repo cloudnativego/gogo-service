@@ -1,6 +1,6 @@
 {
 	"ImportPath": "github.com/cloudnativego/gogo-service",
-	"GoVersion": "go1.5",
+	"GoVersion": "go1.5.2",
 	"Packages": [
 		"./..."
 	],
