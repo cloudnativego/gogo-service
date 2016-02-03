@@ -17,6 +17,8 @@ func NewServer() *negroni.Negroni {
 
 	n := negroni.Classic()
 	mx := mux.NewRouter()
+
+	//Detect if mongodb service is bound; if not, create inMemoryRepo
 	repo := newInMemoryRepository()
 
 	initRoutes(mx, formatter, repo)
