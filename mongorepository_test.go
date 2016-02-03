@@ -10,17 +10,6 @@ import (
 
 var (
 	fakeDBURI = "mongodb://fake.uri@addr:port/guid"
-	// fakeMatches = []matchRecord{
-	// 	matchRecord{
-	// 		ID:          bson.NewObjectId(),
-	// 		TurnCount:   0,
-	// 		GridSize:    64,
-	// 		StartTime:   "some date",
-	// 		PlayerBlack: "black",
-	// 		PlayerWhite: "white",
-	// 	},
-	// }
-
 )
 
 func TestAddMatchShowsUpInMongoRepository(t *testing.T) {
@@ -54,14 +43,8 @@ func TestAddMatchShowsUpInMongoRepository(t *testing.T) {
 
 // }
 
-// func TestNewMongoRepositoryIsEmpty(t *testing.T) {
-
-// }
-
 // func TestMatchUpdateShowsInMatchListAndMatchDetails(t *testing.T) {
 // 	// create match; puts in repo
 // 	// modify turn count and game board; then call update
 // 	// verify match details reflect new state
 // }
-
-// use fake cfmgo.Collection

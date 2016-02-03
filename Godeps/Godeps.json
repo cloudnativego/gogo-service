@@ -1,35 +1,27 @@
 {
 	"ImportPath": "github.com/cloudnativego/gogo-service",
-	"GoVersion": "go1.5.2",
+	"GoVersion": "go1.5",
 	"Packages": [
 		"./..."
 	],
 	"Deps": [
 		{
-			"ImportPath": "code.google.com/p/go-uuid/uuid",
-			"Comment": "null-15",
-			"Rev": "35bc42037350f0078e3c974c6ea690f1926603ab"
+			"ImportPath": "github.com/cloudfoundry-community/go-cfenv",
+			"Comment": "v1.12",
+			"Rev": "c682e189b94b0b2ec6edf12363df2eecf29d7256"
 		},
 		{
-			"ImportPath": "github.com/cloudnativego/gogo-engine",
-			"Rev": "e596d29862182adf42d9bb0713763dea664bea3b"
+			"ImportPath": "github.com/mitchellh/mapstructure",
+			"Rev": "281073eb9eb092240d33ef253c404f1cca550309"
 		},
 		{
-			"ImportPath": "github.com/codegangsta/negroni",
-			"Comment": "v0.1-70-gc7477ad",
-			"Rev": "c7477ad8e330bef55bf1ebe300cf8aa67c492d1b"
+			"ImportPath": "github.com/pivotal-pez/cfmgo",
+			"Rev": "a3ef2b434afe8559f4e392c799a6066d8585230d"
 		},
 		{
-			"ImportPath": "github.com/gorilla/context",
-			"Rev": "215affda49addc4c8ef7e2534915df2c8c35c6cd"
-		},
-		{
-			"ImportPath": "github.com/gorilla/mux",
-			"Rev": "ee1815431e497d3850809578c93ab6705f1a19f7"
-		},
-		{
-			"ImportPath": "github.com/unrolled/render",
-			"Rev": "c442bc30e10d9a5ad49f2837d5e175de0bd0a52a"
+			"ImportPath": "gopkg.in/mgo.v2",
+			"Comment": "r2015.06.03-3-g3569c88",
+			"Rev": "3569c88678d88179dcbd68d02ab081cbca3cd4d0"
 		}
 	]
 }

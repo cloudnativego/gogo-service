@@ -23,6 +23,8 @@ type matchRecord struct {
 	PlayerWhite string        `json:"player_white"`
 }
 
+//This is poorly named.  Name should communicate connecting to mongodb collection
+//which may or may not be empty.
 func newMongoMatchRepository(col cfmgo.Collection) (repo *mongoMatchRepository) {
 	repo = &mongoMatchRepository{
 		Collection: col,
