@@ -25,7 +25,7 @@ var (
 	})
 )
 
-func TestCreateMatchRespondsToBadData(t *testing.T) {
+func CreateMatchRespondsToBadData(t *testing.T) {
 	client := &http.Client{}
 	repo := newInMemoryRepository()
 	server := httptest.NewServer(http.HandlerFunc(createMatchHandler(formatter, repo)))
@@ -92,8 +92,9 @@ func TestCreateMatch(t *testing.T) {
 		t.Errorf("Expected response status 201, received %s", res.Status)
 	}
 
-	loc := res.Header["Location"]
-	if loc == nil {
+	loc, headerOk := res.Header["Location"]
+
+	if !headerOk {
 		t.Error("Location header is not set")
 	} else {
 		if !strings.Contains(loc[0], "/matches/") {
