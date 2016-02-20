@@ -4,23 +4,8 @@ package cfmgo
 import (
 	"fmt"
 
-	"github.com/cloudfoundry-community/go-cfenv"
 	"gopkg.in/mgo.v2"
 )
-
-//GetServiceBinding parses a *cfenv.App object and returns a URI for the specified service.  (Refer to http://github.com/cloudfountry-community/go-cfenv for more details.)
-func GetServiceBinding(serviceName string, serviceURIName string, appEnv *cfenv.App) (serviceURI string) {
-
-	if service, err := appEnv.Services.WithName(serviceName); err == nil {
-		if serviceURI = service.Credentials[serviceURIName].(string); serviceURI == "" {
-			panic(fmt.Sprintf("we pulled an empty connection string %s from %v - %v", serviceURI, service, service.Credentials))
-		}
-
-	} else {
-		panic(fmt.Sprint("Experienced an error trying to grab service binding information:", err.Error()))
-	}
-	return
-}
 
 //Connect to the specified database and return a Collection object for the specified collection.
 func Connect(dialer CollectionDialer, URI string, collectionName string) (collection Collection) {

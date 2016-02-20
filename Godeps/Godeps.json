@@ -1,6 +1,6 @@
 {
 	"ImportPath": "github.com/cloudnativego/gogo-service",
-	"GoVersion": "go1.5",
+	"GoVersion": "go1.6",
 	"Packages": [
 		"./..."
 	],
@@ -11,9 +11,8 @@
 			"Rev": "'35bc42037350f0078e3c974c6ea690f1926603ab'"
 		},
 		{
-			"ImportPath": "github.com/cloudfoundry-community/go-cfenv",
-			"Comment": "v1.12",
-			"Rev": "c682e189b94b0b2ec6edf12363df2eecf29d7256"
+			"ImportPath": "github.com/cloudnativego/cfmgo",
+			"Rev": "22a91e5f27de8050525ff52884c55989cfdf9aff"
 		},
 		{
 			"ImportPath": "github.com/cloudnativego/gogo-engine",
@@ -31,14 +30,6 @@
 		{
 			"ImportPath": "github.com/gorilla/mux",
 			"Rev": "ee1815431e497d3850809578c93ab6705f1a19f7"
-		},
-		{
-			"ImportPath": "github.com/mitchellh/mapstructure",
-			"Rev": "281073eb9eb092240d33ef253c404f1cca550309"
-		},
-		{
-			"ImportPath": "github.com/pivotal-pez/cfmgo",
-			"Rev": "a3ef2b434afe8559f4e392c799a6066d8585230d"
 		},
 		{
 			"ImportPath": "github.com/unrolled/render",
