@@ -19,8 +19,8 @@ func TestAddMatchShowsUpInMongoRepository(t *testing.T) {
 		fakeDBURI,
 		MatchesCollectionName)
 
-	match := gogo.NewMatch(19, "bob", "alfred")
 	repo := newMongoMatchRepository(matchesCollection)
+	match := gogo.NewMatch(19, "bob", "alfred")
 	err := repo.addMatch(match)
 	if err != nil {
 		t.Error("Got an error adding a match to mongo, should not have.")
@@ -30,21 +30,54 @@ func TestAddMatchShowsUpInMongoRepository(t *testing.T) {
 	if err != nil {
 		t.Errorf("Got an error retrieving matches: %v", err)
 	}
-	if len(matches) == 0 {
-		t.Errorf("Expected matches length to be greater than 0")
+	if len(matches) != 1 {
+		t.Errorf("Expected matches length to be 1; received %d", len(matches))
 	}
 }
 
-// func TestAddMatchToPopulateMongoRepository(t *testing.T) {
-// 	// make sure no destroy of existing
-// }
+func TestGetMatchRetrievesProperMatchFromMongo(t *testing.T) {
+	fakes.TargetCount = 1
+	var fakeMatches = []matchRecord{}
+	var matchesCollection = cfmgo.Connect(
+		fakes.FakeNewCollectionDialer(fakeMatches),
+		fakeDBURI,
+		MatchesCollectionName)
 
-// func TestGetMatchRetrievesProperMatchFromMongo(t *testing.T) {
+	repo := newMongoMatchRepository(matchesCollection)
+	match := gogo.NewMatch(19, "bob", "alfred")
+	err := repo.addMatch(match)
+	if err != nil {
+		t.Errorf("Got an error adding a match to mongo: %v", err)
+	}
 
-// }
+	targetID := match.ID
+	foundMatch, err := repo.getMatch(targetID)
+	if err != nil {
+		t.Errorf("Unable to find match with ID: %v... %s", targetID, err)
+	}
 
-// func TestMatchUpdateShowsInMatchListAndMatchDetails(t *testing.T) {
-// 	// create match; puts in repo
-// 	// modify turn count and game board; then call update
-// 	// verify match details reflect new state
-// }
+	if foundMatch.GridSize != 19 || foundMatch.PlayerBlack != "bob" {
+		t.Errorf("Unexpected match results: %v", foundMatch)
+	}
+}
+
+func TestGetNonExistentMatchReturnsError(t *testing.T) {
+	fakes.TargetCount = 0
+	var fakeMatches = []matchRecord{}
+	var matchesCollection = cfmgo.Connect(
+		fakes.FakeNewCollectionDialer(fakeMatches),
+		fakeDBURI,
+		MatchesCollectionName)
+
+	repo := newMongoMatchRepository(matchesCollection)
+
+	_, err := repo.getMatch("buckshank")
+	if err == nil {
+		t.Errorf("Expected getMatch to error with incorrect match details")
+	}
+
+	if err.Error() != "Match not found" {
+		t.Errorf("Expected 'Match not found' error; received: '%v'", err)
+	}
+
+}

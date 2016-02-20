@@ -8,6 +8,8 @@ import (
 	"gopkg.in/mgo.v2"
 )
 
+var TargetCount int = 1
+
 //FakeNewCollectionDialer -
 func FakeNewCollectionDialer(c interface{}) func(url, dbname, collectionname string) (col cfmgo.Collection, err error) {
 	b, err := json.Marshal(c)
@@ -42,8 +44,9 @@ func (s *FakeCollection) Wake() {
 
 //Find -- finds all records matching given selector
 func (s *FakeCollection) Find(params cfmgo.Params, result interface{}) (count int, err error) {
-	count = 1
+	count = TargetCount
 	err = json.Unmarshal(s.Data, result)
+
 	return
 }
 

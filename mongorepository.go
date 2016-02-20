@@ -1,7 +1,12 @@
 package main
 
 import (
+	"errors"
+	"fmt"
+	"time"
+
 	"github.com/cloudnativego/cfmgo"
+	"github.com/cloudnativego/cfmgo/params"
 	"github.com/cloudnativego/gogo-engine"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -48,11 +53,40 @@ func (r *mongoMatchRepository) getMatches() (matches []matchRecord, err error) {
 }
 
 func (r *mongoMatchRepository) getMatch(id string) (match gogo.Match, err error) {
+	matchRecord, err := r.getMongoMatch(id)
+	if err == nil {
+		match = convertMatchRecordToMatch(matchRecord)
+	}
 	return
 }
 
-func (r *mongoMatchRepository) updateMatch(id string, match gogo.Match) error {
-	return nil
+func (r *mongoMatchRepository) getMongoMatch(id string) (mongoMatch matchRecord, err error) {
+	r.Collection.Wake()
+
+	matches := make([]matchRecord, 0)
+	query := bson.M{"match_id": id}
+	params := &params.RequestParams{
+		Q: query,
+	}
+
+	count, err := r.Collection.Find(params, &matches)
+	if count == 0 {
+		err = errors.New("Match not found")
+	}
+	if err == nil {
+		mongoMatch = matches[0]
+	}
+	return
+}
+
+func (r *mongoMatchRepository) updateMatch(id string, match gogo.Match) (err error) {
+	foundMatch, err := r.getMongoMatch(id)
+	if err == nil {
+		mr := convertMatchToMatchRecord(match)
+		mr.RecordID = foundMatch.RecordID
+		_, err = r.Collection.UpsertID(mr.RecordID, mr)
+	}
+	return
 }
 
 func convertMatchToMatchRecord(m gogo.Match) (mr *matchRecord) {
@@ -64,6 +98,23 @@ func convertMatchToMatchRecord(m gogo.Match) (mr *matchRecord) {
 		StartTime:   m.StartTime.Format("2006-01-02 15:04:05"),
 		PlayerBlack: m.PlayerBlack,
 		PlayerWhite: m.PlayerWhite,
+	}
+	return
+}
+
+func convertMatchRecordToMatch(mr matchRecord) (m gogo.Match) {
+	t, err := time.Parse("2006-01-02 15:04:05", mr.StartTime)
+	if err != nil {
+		fmt.Printf("Error parsing time value in Match Record: %v", err)
+	} else {
+		m = gogo.Match{
+			ID:          mr.MatchID,
+			TurnCount:   mr.TurnCount,
+			GridSize:    mr.GridSize,
+			StartTime:   t,
+			PlayerBlack: mr.PlayerBlack,
+			PlayerWhite: mr.PlayerWhite,
+		}
 	}
 	return
 }
