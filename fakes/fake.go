@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"strconv"
 
-	"github.com/pivotal-pez/cfmgo"
+	"github.com/cloudnativego/cfmgo"
 	"gopkg.in/mgo.v2"
 )
 
