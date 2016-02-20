@@ -17,7 +17,7 @@ build:
     - script:
         name: go build
         code: |
-          godep go build ./...
+          godep go build
 
     # Test the project
     - script:
