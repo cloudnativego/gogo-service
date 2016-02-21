@@ -28,7 +28,7 @@ type matchRecord struct {
 
 //This is poorly named.  Name should communicate connecting to mongodb collection
 //which may or may not be empty.
-func newMongoMatchRepository(col cfmgo.Collection) (repo *mongoMatchRepository) {
+func NewMongoMatchRepository(col cfmgo.Collection) (repo *mongoMatchRepository) {
 	repo = &mongoMatchRepository{
 		Collection: col,
 	}

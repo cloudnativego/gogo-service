@@ -1,5 +1,8 @@
 box: golang
 
+services:
+  - mongo
+
 build:
 
   steps:
@@ -19,11 +22,20 @@ build:
         code: |
           godep go build
 
+    - script:
+        name: env
+        code: env
+
     # Test the project
     - script:
         name: go test
         code: |
           godep go test -v ./...
+
+    - script:
+        name: integration tests
+        code: |
+          godep go test ./integrations/_test -v -race
 
     - script:
         name: copy files to wercker output

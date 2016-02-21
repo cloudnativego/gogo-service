@@ -19,7 +19,7 @@ func TestAddMatchShowsUpInMongoRepository(t *testing.T) {
 		fakeDBURI,
 		MatchesCollectionName)
 
-	repo := newMongoMatchRepository(matchesCollection)
+	repo := NewMongoMatchRepository(matchesCollection)
 	match := gogo.NewMatch(19, "bob", "alfred")
 	err := repo.addMatch(match)
 	if err != nil {
@@ -43,7 +43,7 @@ func TestGetMatchRetrievesProperMatchFromMongo(t *testing.T) {
 		fakeDBURI,
 		MatchesCollectionName)
 
-	repo := newMongoMatchRepository(matchesCollection)
+	repo := NewMongoMatchRepository(matchesCollection)
 	match := gogo.NewMatch(19, "bob", "alfred")
 	err := repo.addMatch(match)
 	if err != nil {
@@ -69,7 +69,7 @@ func TestGetNonExistentMatchReturnsError(t *testing.T) {
 		fakeDBURI,
 		MatchesCollectionName)
 
-	repo := newMongoMatchRepository(matchesCollection)
+	repo := NewMongoMatchRepository(matchesCollection)
 
 	_, err := repo.getMatch("buckshank")
 	if err == nil {
