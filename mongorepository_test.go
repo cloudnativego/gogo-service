@@ -13,7 +13,7 @@ var (
 )
 
 func TestAddMatchShowsUpInMongoRepository(t *testing.T) {
-	var fakeMatches = []matchRecord{}
+	var fakeMatches = []MatchRecord{}
 	var matchesCollection = cfmgo.Connect(
 		fakes.FakeNewCollectionDialer(fakeMatches),
 		fakeDBURI,
@@ -21,12 +21,12 @@ func TestAddMatchShowsUpInMongoRepository(t *testing.T) {
 
 	repo := NewMongoMatchRepository(matchesCollection)
 	match := gogo.NewMatch(19, "bob", "alfred")
-	err := repo.addMatch(match)
+	err := repo.AddMatch(match)
 	if err != nil {
-		t.Error("Got an error adding a match to mongo, should not have.")
+		t.Errorf("Error adding match to mongo: %v", err)
 	}
 
-	matches, err := repo.getMatches()
+	matches, err := repo.GetMatches()
 	if err != nil {
 		t.Errorf("Got an error retrieving matches: %v", err)
 	}
@@ -37,7 +37,7 @@ func TestAddMatchShowsUpInMongoRepository(t *testing.T) {
 
 func TestGetMatchRetrievesProperMatchFromMongo(t *testing.T) {
 	fakes.TargetCount = 1
-	var fakeMatches = []matchRecord{}
+	var fakeMatches = []MatchRecord{}
 	var matchesCollection = cfmgo.Connect(
 		fakes.FakeNewCollectionDialer(fakeMatches),
 		fakeDBURI,
@@ -45,13 +45,13 @@ func TestGetMatchRetrievesProperMatchFromMongo(t *testing.T) {
 
 	repo := NewMongoMatchRepository(matchesCollection)
 	match := gogo.NewMatch(19, "bob", "alfred")
-	err := repo.addMatch(match)
+	err := repo.AddMatch(match)
 	if err != nil {
-		t.Errorf("Got an error adding a match to mongo: %v", err)
+		t.Errorf("Error adding match to mongo: %v", err)
 	}
 
 	targetID := match.ID
-	foundMatch, err := repo.getMatch(targetID)
+	foundMatch, err := repo.GetMatch(targetID)
 	if err != nil {
 		t.Errorf("Unable to find match with ID: %v... %s", targetID, err)
 	}
@@ -63,7 +63,7 @@ func TestGetMatchRetrievesProperMatchFromMongo(t *testing.T) {
 
 func TestGetNonExistentMatchReturnsError(t *testing.T) {
 	fakes.TargetCount = 0
-	var fakeMatches = []matchRecord{}
+	var fakeMatches = []MatchRecord{}
 	var matchesCollection = cfmgo.Connect(
 		fakes.FakeNewCollectionDialer(fakeMatches),
 		fakeDBURI,
@@ -71,7 +71,7 @@ func TestGetNonExistentMatchReturnsError(t *testing.T) {
 
 	repo := NewMongoMatchRepository(matchesCollection)
 
-	_, err := repo.getMatch("buckshank")
+	_, err := repo.GetMatch("buckshank")
 	if err == nil {
 		t.Errorf("Expected getMatch to error with incorrect match details")
 	}
@@ -79,5 +79,4 @@ func TestGetNonExistentMatchReturnsError(t *testing.T) {
 	if err.Error() != "Match not found" {
 		t.Errorf("Expected 'Match not found' error; received: '%v'", err)
 	}
-
 }

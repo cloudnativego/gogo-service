@@ -42,7 +42,6 @@ build:
         code: |
           cp -R ./ ${WERCKER_OUTPUT_DIR}
 
-
 deploy:
  steps:
    - internal/docker-push:

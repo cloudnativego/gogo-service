@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/cloudnativego/cfmgo"
+	"github.com/cloudnativego/gogo-engine"
 
 	. "github.com/cloudnativego/gogo-service"
 )
@@ -25,17 +26,35 @@ func getRepo(collectionName string) (col cfmgo.Collection, err error) {
 
 	uri := fmt.Sprintf("mongodb://%s:%s/fake-guid", host, port)
 	col = cfmgo.Connect(cfmgo.NewCollectionDialer, uri, collectionName)
-
 	return
 }
 
 func TestAddMatchToRepo(t *testing.T) {
-	matches, err := getRepo("matches")
+	matchesCollection, err := getRepo("matches")
 	if err != nil {
 		t.Fatalf("Error: %v", err)
 	}
-	repo := NewMongoMatchRepository(matches)
-	if repo == nil {
-		t.Error("Error creating Mongo repo")
+	repo := NewMongoMatchRepository(matchesCollection)
+	match := gogo.NewMatch(19, "buckshank", "d'squarius")
+	err = repo.AddMatch(match)
+	if err != nil {
+		t.Errorf("Error adding match to mongo: %v", err)
+	}
+
+	matches, err := repo.GetMatches()
+	if err != nil {
+		t.Errorf("Error retrieving matches: %v", err)
+	}
+	if len(matches) == 0 {
+		t.Errorf("Expected matches length to be greater than 0; received %d", len(matches))
+	}
+
+	foundMatch, err := repo.GetMatch(match.ID)
+	if err != nil {
+		t.Errorf("Unable to find match with ID: %v... %s", match.ID, err)
+		fmt.Printf(">>>>>>>>> MATCHES: \n %+v", matches)
+	}
+	if foundMatch.GridSize != match.GridSize || foundMatch.PlayerBlack != match.PlayerBlack {
+		t.Errorf("Unexpected match results: %v", foundMatch)
 	}
 }
