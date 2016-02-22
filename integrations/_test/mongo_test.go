@@ -57,3 +57,30 @@ func TestAddMatchToRepo(t *testing.T) {
 		t.Errorf("Unexpected match results: %v", foundMatch)
 	}
 }
+
+func TestUpdateMatch(t *testing.T) {
+	matchesCollection, err := getRepo("matches")
+	if err != nil {
+		t.Fatalf("Error: %v", err)
+	}
+	repo := NewMongoMatchRepository(matchesCollection)
+	match := gogo.NewMatch(13, "d'pez", "poopsie")
+	err = repo.AddMatch(match)
+	if err != nil {
+		t.Errorf("Error adding match to mongo: %v", err)
+	}
+
+	match.TurnCount = 3
+	err = repo.UpdateMatch(match.ID, match)
+	if err != nil {
+		t.Errorf("Error updating match: %v", err)
+	}
+
+	foundMatch, err := repo.GetMatch(match.ID)
+	if err != nil {
+		t.Errorf("Unable to find match with ID: %v... %s", match.ID, err)
+	}
+	if foundMatch.TurnCount != match.TurnCount {
+		t.Errorf("Match update failed: expected %d; received %d", match.TurnCount, foundMatch.TurnCount)
+	}
+}

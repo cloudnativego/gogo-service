@@ -71,7 +71,7 @@ func TestGetNonExistentMatchReturnsError(t *testing.T) {
 
 	repo := NewMongoMatchRepository(matchesCollection)
 
-	_, err := repo.GetMatch("buckshank")
+	_, err := repo.GetMatch("bad_id")
 	if err == nil {
 		t.Errorf("Expected getMatch to error with incorrect match details")
 	}

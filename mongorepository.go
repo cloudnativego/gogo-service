@@ -39,15 +39,15 @@ func NewMongoMatchRepository(col cfmgo.Collection) (repo *MongoMatchRepository) 
 
 //AddMatch inserts a new record into the repo.
 func (r *MongoMatchRepository) AddMatch(match gogo.Match) (err error) {
-	mr := convertMatchToMatchRecord(match)
-
 	r.Collection.Wake()
+	mr := convertMatchToMatchRecord(match)
 	_, err = r.Collection.UpsertID(mr.RecordID, mr)
 	return
 }
 
 //GetMatch returns a match record from the repo based on the ID.
 func (r *MongoMatchRepository) GetMatch(id string) (match gogo.Match, err error) {
+	r.Collection.Wake()
 	MatchRecord, err := r.getMongoMatch(id)
 	if err == nil {
 		match = convertMatchRecordToMatch(MatchRecord)
@@ -56,17 +56,17 @@ func (r *MongoMatchRepository) GetMatch(id string) (match gogo.Match, err error)
 }
 
 //GetMatches returns all matches in the repo.
+//FIXME: Return value of []MatchRecord seems incorrect; should be []gogo.Match
 func (r *MongoMatchRepository) GetMatches() (matches []MatchRecord, err error) {
 	r.Collection.Wake()
-
 	matches = make([]MatchRecord, 0)
-
 	_, err = r.Collection.Find(cfmgo.ParamsUnfiltered, &matches)
-	return matches, err
+	return
 }
 
 //UpdateMatch replaces the match state for the given ID with current match state.
 func (r *MongoMatchRepository) UpdateMatch(id string, match gogo.Match) (err error) {
+	r.Collection.Wake()
 	foundMatch, err := r.getMongoMatch(id)
 	if err == nil {
 		mr := convertMatchToMatchRecord(match)
@@ -77,8 +77,6 @@ func (r *MongoMatchRepository) UpdateMatch(id string, match gogo.Match) (err err
 }
 
 func (r *MongoMatchRepository) getMongoMatch(id string) (mongoMatch MatchRecord, err error) {
-	r.Collection.Wake()
-
 	var matches []MatchRecord
 	query := bson.M{"match_id": id}
 	params := &params.RequestParams{
