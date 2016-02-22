@@ -56,11 +56,16 @@ func (r *MongoMatchRepository) GetMatch(id string) (match gogo.Match, err error)
 }
 
 //GetMatches returns all matches in the repo.
-//FIXME: Return value of []MatchRecord seems incorrect; should be []gogo.Match
-func (r *MongoMatchRepository) GetMatches() (matches []MatchRecord, err error) {
+func (r *MongoMatchRepository) GetMatches() (matches []gogo.Match, err error) {
 	r.Collection.Wake()
-	matches = make([]MatchRecord, 0)
-	_, err = r.Collection.Find(cfmgo.ParamsUnfiltered, &matches)
+	var mr []MatchRecord
+	_, err = r.Collection.Find(cfmgo.ParamsUnfiltered, &mr)
+	if err == nil {
+		matches = make([]gogo.Match, len(mr))
+		for k, v := range mr {
+			matches[k] = convertMatchRecordToMatch(v)
+		}
+	}
 	return
 }
 
