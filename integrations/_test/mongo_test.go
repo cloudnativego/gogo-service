@@ -52,7 +52,6 @@ func TestAddMatchToRepo(t *testing.T) {
 	foundMatch, err := repo.GetMatch(match.ID)
 	if err != nil {
 		t.Errorf("Unable to find match with ID: %v... %s", match.ID, err)
-		fmt.Printf(">>>>>>>>> MATCHES: \n %+v", matches)
 	}
 	if foundMatch.GridSize != match.GridSize || foundMatch.PlayerBlack != match.PlayerBlack {
 		t.Errorf("Unexpected match results: %v", foundMatch)
