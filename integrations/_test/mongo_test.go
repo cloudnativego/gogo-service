@@ -30,7 +30,7 @@ func getRepo(collectionName string) (col cfmgo.Collection, err error) {
 }
 
 func TestAddMatchToRepo(t *testing.T) {
-	matchesCollection, err := getRepo("matches")
+	matchesCollection, err := getRepo(MatchesCollectionName)
 	if err != nil {
 		t.Fatalf("Error: %v", err)
 	}
@@ -59,7 +59,7 @@ func TestAddMatchToRepo(t *testing.T) {
 }
 
 func TestUpdateMatch(t *testing.T) {
-	matchesCollection, err := getRepo("matches")
+	matchesCollection, err := getRepo(MatchesCollectionName)
 	if err != nil {
 		t.Fatalf("Error: %v", err)
 	}
