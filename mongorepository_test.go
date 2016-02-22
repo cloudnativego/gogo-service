@@ -13,20 +13,20 @@ var (
 )
 
 func TestAddMatchShowsUpInMongoRepository(t *testing.T) {
-	var fakeMatches = []MatchRecord{}
+	var fakeMatches = []matchRecord{}
 	var matchesCollection = cfmgo.Connect(
 		fakes.FakeNewCollectionDialer(fakeMatches),
 		fakeDBURI,
 		MatchesCollectionName)
 
-	repo := NewMongoMatchRepository(matchesCollection)
+	repo := newMongoMatchRepository(matchesCollection)
 	match := gogo.NewMatch(19, "bob", "alfred")
-	err := repo.AddMatch(match)
+	err := repo.addMatch(match)
 	if err != nil {
 		t.Errorf("Error adding match to mongo: %v", err)
 	}
 
-	matches, err := repo.GetMatches()
+	matches, err := repo.getMatches()
 	if err != nil {
 		t.Errorf("Got an error retrieving matches: %v", err)
 	}
@@ -37,21 +37,21 @@ func TestAddMatchShowsUpInMongoRepository(t *testing.T) {
 
 func TestGetMatchRetrievesProperMatchFromMongo(t *testing.T) {
 	fakes.TargetCount = 1
-	var fakeMatches = []MatchRecord{}
+	var fakeMatches = []matchRecord{}
 	var matchesCollection = cfmgo.Connect(
 		fakes.FakeNewCollectionDialer(fakeMatches),
 		fakeDBURI,
 		MatchesCollectionName)
 
-	repo := NewMongoMatchRepository(matchesCollection)
+	repo := newMongoMatchRepository(matchesCollection)
 	match := gogo.NewMatch(19, "bob", "alfred")
-	err := repo.AddMatch(match)
+	err := repo.addMatch(match)
 	if err != nil {
 		t.Errorf("Error adding match to mongo: %v", err)
 	}
 
 	targetID := match.ID
-	foundMatch, err := repo.GetMatch(targetID)
+	foundMatch, err := repo.getMatch(targetID)
 	if err != nil {
 		t.Errorf("Unable to find match with ID: %v... %s", targetID, err)
 	}
@@ -63,15 +63,15 @@ func TestGetMatchRetrievesProperMatchFromMongo(t *testing.T) {
 
 func TestGetNonExistentMatchReturnsError(t *testing.T) {
 	fakes.TargetCount = 0
-	var fakeMatches = []MatchRecord{}
+	var fakeMatches = []matchRecord{}
 	var matchesCollection = cfmgo.Connect(
 		fakes.FakeNewCollectionDialer(fakeMatches),
 		fakeDBURI,
 		MatchesCollectionName)
 
-	repo := NewMongoMatchRepository(matchesCollection)
+	repo := newMongoMatchRepository(matchesCollection)
 
-	_, err := repo.GetMatch("bad_id")
+	_, err := repo.getMatch("bad_id")
 	if err == nil {
 		t.Errorf("Expected getMatch to error with incorrect match details")
 	}

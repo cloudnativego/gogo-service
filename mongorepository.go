@@ -11,14 +11,11 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-//MongoMatchRepository object contains the matches collection and methods to
-//act upon that data.
-type MongoMatchRepository struct {
+type mongoMatchRepository struct {
 	Collection cfmgo.Collection
 }
 
-//MatchRecord is a struct representing a match in mongo.
-type MatchRecord struct {
+type matchRecord struct {
 	RecordID    bson.ObjectId `bson:"_id,omitempty" json:"id"`
 	MatchID     string        `bson:"match_id",json:"match_id"`
 	TurnCount   int           `bson:"turn_count",json:"turn_count"`
@@ -29,36 +26,32 @@ type MatchRecord struct {
 	PlayerWhite string        `bson:"player_white",json:"player_white"`
 }
 
-//NewMongoMatchRepository instantiates a new match repository object.
-func NewMongoMatchRepository(col cfmgo.Collection) (repo *MongoMatchRepository) {
-	repo = &MongoMatchRepository{
+func newMongoMatchRepository(col cfmgo.Collection) (repo *mongoMatchRepository) {
+	repo = &mongoMatchRepository{
 		Collection: col,
 	}
 	return
 }
 
-//AddMatch inserts a new record into the repo.
-func (r *MongoMatchRepository) AddMatch(match gogo.Match) (err error) {
+func (r *mongoMatchRepository) addMatch(match gogo.Match) (err error) {
 	r.Collection.Wake()
 	mr := convertMatchToMatchRecord(match)
 	_, err = r.Collection.UpsertID(mr.RecordID, mr)
 	return
 }
 
-//GetMatch returns a match record from the repo based on the ID.
-func (r *MongoMatchRepository) GetMatch(id string) (match gogo.Match, err error) {
+func (r *mongoMatchRepository) getMatch(id string) (match gogo.Match, err error) {
 	r.Collection.Wake()
-	MatchRecord, err := r.getMongoMatch(id)
+	matchRecord, err := r.getMongoMatch(id)
 	if err == nil {
-		match = convertMatchRecordToMatch(MatchRecord)
+		match = convertMatchRecordToMatch(matchRecord)
 	}
 	return
 }
 
-//GetMatches returns all matches in the repo.
-func (r *MongoMatchRepository) GetMatches() (matches []gogo.Match, err error) {
+func (r *mongoMatchRepository) getMatches() (matches []gogo.Match, err error) {
 	r.Collection.Wake()
-	var mr []MatchRecord
+	var mr []matchRecord
 	_, err = r.Collection.Find(cfmgo.ParamsUnfiltered, &mr)
 	if err == nil {
 		matches = make([]gogo.Match, len(mr))
@@ -69,8 +62,7 @@ func (r *MongoMatchRepository) GetMatches() (matches []gogo.Match, err error) {
 	return
 }
 
-//UpdateMatch replaces the match state for the given ID with current match state.
-func (r *MongoMatchRepository) UpdateMatch(id string, match gogo.Match) (err error) {
+func (r *mongoMatchRepository) updateMatch(id string, match gogo.Match) (err error) {
 	r.Collection.Wake()
 	foundMatch, err := r.getMongoMatch(id)
 	if err == nil {
@@ -81,8 +73,8 @@ func (r *MongoMatchRepository) UpdateMatch(id string, match gogo.Match) (err err
 	return
 }
 
-func (r *MongoMatchRepository) getMongoMatch(id string) (mongoMatch MatchRecord, err error) {
-	var matches []MatchRecord
+func (r *mongoMatchRepository) getMongoMatch(id string) (mongoMatch matchRecord, err error) {
+	var matches []matchRecord
 	query := bson.M{"match_id": id}
 	params := &params.RequestParams{
 		Q: query,
@@ -98,8 +90,8 @@ func (r *MongoMatchRepository) getMongoMatch(id string) (mongoMatch MatchRecord,
 	return
 }
 
-func convertMatchToMatchRecord(m gogo.Match) (mr *MatchRecord) {
-	mr = &MatchRecord{
+func convertMatchToMatchRecord(m gogo.Match) (mr *matchRecord) {
+	mr = &matchRecord{
 		RecordID:    bson.NewObjectId(),
 		MatchID:     m.ID,
 		TurnCount:   m.TurnCount,
@@ -111,7 +103,7 @@ func convertMatchToMatchRecord(m gogo.Match) (mr *MatchRecord) {
 	return
 }
 
-func convertMatchRecordToMatch(mr MatchRecord) (m gogo.Match) {
+func convertMatchRecordToMatch(mr matchRecord) (m gogo.Match) {
 	t, err := time.Parse("2006-01-02 15:04:05", mr.StartTime)
 	if err != nil {
 		fmt.Printf("Error parsing time value in Match Record: %v", err)
