@@ -39,7 +39,7 @@ type newMoveRequest struct {
 
 type matchRepository interface {
 	addMatch(match gogo.Match) (err error)
-	getMatches() []gogo.Match
+	getMatches() (matches []gogo.Match, err error)
 	getMatch(id string) (match gogo.Match, err error)
 	updateMatch(id string, match gogo.Match) (err error)
 }

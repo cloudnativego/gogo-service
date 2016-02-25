@@ -1,0 +1,5 @@
+---
+userprovided:
+- name: mongodb
+  credentials:
+    url: mongodb://{{.MONGO_PORT_27017_TCP_ADDR}}:{{.MONGO_PORT_27017_TCP_PORT}}/some-guid-string

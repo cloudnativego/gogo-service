@@ -1,8 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
+	"os"
 
+	"github.com/cloudfoundry-community/go-cfenv"
+	"github.com/cloudnativego/cf-tools"
+	"github.com/cloudnativego/cfmgo"
 	"github.com/codegangsta/negroni"
 	"github.com/gorilla/mux"
 	"github.com/unrolled/render"
@@ -18,8 +23,7 @@ func NewServer() *negroni.Negroni {
 	n := negroni.Classic()
 	mx := mux.NewRouter()
 
-	//Detect if mongodb service is bound; if not, create inMemoryRepo
-	repo := newInMemoryRepository()
+	repo := initRepository()
 
 	initRoutes(mx, formatter, repo)
 
@@ -40,4 +44,22 @@ func testHandler(formatter *render.Render) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		formatter.JSON(w, http.StatusOK, struct{ Test string }{"This is a test"})
 	}
+}
+
+func initRepository() (repo matchRepository) {
+	appEnv, _ := cfenv.Current()
+	dbServiceName := os.Getenv("DB_SERVICE_NAME")
+	dbServiceURIName := os.Getenv("DB_SERVICE_URI")
+	dbServiceURI, err := cftools.GetVCAPServiceProperty(dbServiceName, dbServiceURIName, appEnv)
+	if err != nil || dbServiceURI == "" {
+		if err != nil {
+			fmt.Printf("\nError retrieving database configuration: %v\n", err)
+		}
+		fmt.Println("MongoDB was not detected; configuring inMemoryRepository...")
+		repo = newInMemoryRepository()
+	}
+	matchCollection := cfmgo.Connect(cfmgo.NewCollectionDialer, dbServiceURI, MatchesCollectionName)
+	fmt.Printf("Connecting to MongoDB service: %s...\n", dbServiceName)
+	repo = newMongoMatchRepository(matchCollection)
+	return
 }

@@ -15,7 +15,10 @@ func TestAddMatchShowsUpInRepository(t *testing.T) {
 		t.Error("Got an error adding a match to repository, should not have.")
 	}
 
-	matches := repo.getMatches()
+	matches, err := repo.getMatches()
+	if err != nil {
+		t.Errorf("Unexpected error in getMatches(): %s", err)
+	}
 	if len(matches) != 1 {
 		t.Errorf("Expected to have 1 match in the repository, got %d", len(matches))
 	}
@@ -50,7 +53,10 @@ func TestGetMatchRetrievesProperMatch(t *testing.T) {
 func TestNewRepositoryIsEmpty(t *testing.T) {
 	repo := newInMemoryRepository()
 
-	matches := repo.getMatches()
+	matches, err := repo.getMatches()
+	if err != nil {
+		t.Errorf("Unexpected error in getMatches(): %s", err)
+	}
 	if len(matches) != 0 {
 		t.Errorf("Expected to have 0 matches in newly created repository, got %d", len(matches))
 	}

@@ -1,0 +1,11 @@
+---
+userprovided:
+- name: my-service-db
+  credentials:
+    url: mongodb://{{.MONGO_PORT_27017_TCP_ADDR}}:{{.MONGO_PORT_27017_TCP_PORT}}/some-guid-string
+- name: my-other-service
+  syslogurl: "tcp://syslog.drain.url"
+  credentials:
+    url: "http://urbandictionary.com"
+    user: "squeeeeeeps"
+    password: "fudge"

@@ -35,12 +35,16 @@ func createMatchHandler(formatter *render.Render, repo matchRepository) http.Han
 
 func getMatchListHandler(formatter *render.Render, repo matchRepository) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
-		repoMatches := repo.getMatches()
-		matches := make([]newMatchResponse, len(repoMatches))
-		for idx, match := range repoMatches {
-			matches[idx] = newMatchResponse{ID: match.ID, GridSize: match.GridSize, PlayerBlack: match.PlayerBlack, PlayerWhite: match.PlayerWhite}
+		repoMatches, err := repo.getMatches()
+		if err == nil {
+			matches := make([]newMatchResponse, len(repoMatches))
+			for idx, match := range repoMatches {
+				matches[idx] = newMatchResponse{ID: match.ID, GridSize: match.GridSize, PlayerBlack: match.PlayerBlack, PlayerWhite: match.PlayerWhite}
+			}
+			formatter.JSON(w, http.StatusOK, matches)
+		} else {
+			formatter.JSON(w, http.StatusNotFound, err.Error())
 		}
-		formatter.JSON(w, http.StatusOK, matches)
 	}
 }
 

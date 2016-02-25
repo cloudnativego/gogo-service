@@ -116,7 +116,10 @@ func TestCreateMatch(t *testing.T) {
 	}
 
 	// After creating a match, match repository should have 1 item in it.
-	matches := repo.getMatches()
+	matches, err := repo.getMatches()
+	if err != nil {
+		t.Errorf("Unexpected error in getMatches(): %s", err)
+	}
 	if len(matches) != 1 {
 		t.Errorf("Expected a match repo of 1 match, got size %d", len(matches))
 	}
@@ -200,7 +203,10 @@ func TestGetMatchListReturnsWhatsInRepository(t *testing.T) {
 		t.Errorf("Could not unmarshal payload into []newMatchResponse slice")
 	}
 
-	repoMatches := repo.getMatches()
+	repoMatches, err := repo.getMatches()
+	if err != nil {
+		t.Errorf("Unexpected error in getMatches(): %s", err)
+	}
 	if len(matchList) != len(repoMatches) {
 		t.Errorf("Match response size should have equaled repo size, sizes were: %d and %d", len(matchList), len(repoMatches))
 	}

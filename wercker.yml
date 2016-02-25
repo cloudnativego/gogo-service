@@ -14,7 +14,17 @@ build:
           cd $WERCKER_SOURCE_DIR
           go version
           go get -u github.com/tools/godep
+          go get -u github.com/cloudnativego/cf-tools/vcapinate
           export PATH=$WERCKER_SOURCE_DIR/bin:$PATH
+
+    # Generate vcap
+    - script:
+        name: vcap
+        code: |
+          export DB_SERVICE_NAME=mongodb
+          export DB_SERVICE_URI=url
+          export VCAP_SERVICES=`vcapinate -path=./integrations/vcap.yml`
+          export VCAP_APPLICATION=[]
 
     # Build the project
     - script:
