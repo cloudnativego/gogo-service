@@ -17,15 +17,6 @@ build:
           go get -u github.com/cloudnativego/cf-tools/vcapinate
           export PATH=$WERCKER_SOURCE_DIR/bin:$PATH
 
-    # Generate vcap
-    - script:
-        name: vcap
-        code: |
-          export DB_SERVICE_NAME=mongodb
-          export DB_SERVICE_URI=url
-          export VCAP_SERVICES=`vcapinate -path=./integrations/vcap.yml`
-          export VCAP_APPLICATION=[]
-
     # Build the project
     - script:
         name: go build
@@ -45,6 +36,8 @@ build:
     - script:
         name: integration tests
         code: |
+          export VCAP_SERVICES=`vcapinate -path=./integrations/vcap.yml`
+          export VCAP_APPLICATION={}
           godep go test ./integrations/_test -v -race
 
     - script:

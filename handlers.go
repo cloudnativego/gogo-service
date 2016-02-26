@@ -27,9 +27,10 @@ func createMatchHandler(formatter *render.Render, repo matchRepository) http.Han
 
 		newMatch := gogo.NewMatch(newMatchRequest.GridSize, newMatchRequest.PlayerBlack, newMatchRequest.PlayerWhite)
 		repo.addMatch(newMatch)
+		var mr newMatchResponse
+		mr.parse(newMatch)
 		w.Header().Add("Location", "/matches/"+newMatch.ID)
-		formatter.JSON(w, http.StatusCreated, &newMatchResponse{ID: newMatch.ID, GridSize: newMatch.GridSize,
-			PlayerBlack: newMatchRequest.PlayerBlack, PlayerWhite: newMatchRequest.PlayerWhite})
+		formatter.JSON(w, http.StatusCreated, &mr)
 	}
 }
 
@@ -39,7 +40,7 @@ func getMatchListHandler(formatter *render.Render, repo matchRepository) http.Ha
 		if err == nil {
 			matches := make([]newMatchResponse, len(repoMatches))
 			for idx, match := range repoMatches {
-				matches[idx] = newMatchResponse{ID: match.ID, GridSize: match.GridSize, PlayerBlack: match.PlayerBlack, PlayerWhite: match.PlayerWhite}
+				matches[idx].parse(match)
 			}
 			formatter.JSON(w, http.StatusOK, matches)
 		} else {
@@ -56,7 +57,9 @@ func getMatchDetailsHandler(formatter *render.Render, repo matchRepository) http
 		if err != nil {
 			formatter.JSON(w, http.StatusNotFound, err.Error())
 		} else {
-			formatter.JSON(w, http.StatusOK, matchDetailsResponse{ID: matchID, GameBoard: match.GameBoard.Positions})
+			var mdr matchDetailsResponse
+			mdr.parse(match)
+			formatter.JSON(w, http.StatusOK, &mdr)
 		}
 	}
 }

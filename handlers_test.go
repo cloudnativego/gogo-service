@@ -241,7 +241,7 @@ func TestGetMatchDetailsReturns404ForNonexistentMatch(t *testing.T) {
 	}
 }
 
-func TestGetMatchDetailsReturns200ForExistingMatch(t *testing.T) {
+func TestGetMatchDetailsReturnsExistingMatch(t *testing.T) {
 	var (
 		request  *http.Request
 		recorder *httptest.ResponseRecorder
@@ -260,6 +260,15 @@ func TestGetMatchDetailsReturns200ForExistingMatch(t *testing.T) {
 
 	if recorder.Code != http.StatusOK {
 		t.Errorf("Expected %v; received %v", http.StatusOK, recorder.Code)
+	}
+
+	var match matchDetailsResponse
+	err := json.Unmarshal(recorder.Body.Bytes(), &match)
+	if err != nil {
+		t.Errorf("Error unmarshaling match details: %s", err)
+	}
+	if match.GridSize != 19 {
+		t.Errorf("Expected match gridsize to be 19; received %d", match.GridSize)
 	}
 }
 

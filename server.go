@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"os"
 
 	"github.com/cloudfoundry-community/go-cfenv"
 	"github.com/cloudnativego/cf-tools"
@@ -48,9 +47,7 @@ func testHandler(formatter *render.Render) http.HandlerFunc {
 
 func initRepository() (repo matchRepository) {
 	appEnv, _ := cfenv.Current()
-	dbServiceName := os.Getenv("DB_SERVICE_NAME")
-	dbServiceURIName := os.Getenv("DB_SERVICE_URI")
-	dbServiceURI, err := cftools.GetVCAPServiceProperty(dbServiceName, dbServiceURIName, appEnv)
+	dbServiceURI, err := cftools.GetVCAPServiceProperty(dbServiceName, "url", appEnv)
 	if err != nil || dbServiceURI == "" {
 		if err != nil {
 			fmt.Printf("\nError retrieving database configuration: %v\n", err)

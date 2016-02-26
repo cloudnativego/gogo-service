@@ -97,6 +97,7 @@ func convertMatchToMatchRecord(m gogo.Match) (mr *matchRecord) {
 		TurnCount:   m.TurnCount,
 		GridSize:    m.GridSize,
 		StartTime:   m.StartTime.Format("2006-01-02 15:04:05"),
+		GameBoard:   m.GameBoard.Positions,
 		PlayerBlack: m.PlayerBlack,
 		PlayerWhite: m.PlayerWhite,
 	}
@@ -113,6 +114,7 @@ func convertMatchRecordToMatch(mr matchRecord) (m gogo.Match) {
 			TurnCount:   mr.TurnCount,
 			GridSize:    mr.GridSize,
 			StartTime:   t,
+			GameBoard:   gogo.GameBoard{Positions: mr.GameBoard},
 			PlayerBlack: mr.PlayerBlack,
 			PlayerWhite: mr.PlayerWhite,
 		}
