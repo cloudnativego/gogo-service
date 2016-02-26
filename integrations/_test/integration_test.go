@@ -3,6 +3,7 @@ package integrations_test
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -11,23 +12,10 @@ import (
 	. "github.com/cloudnativego/gogo-service"
 )
 
-/*
-	..GetMatches empty array
-	..AddMatch
-	..AddSecondMatch
-	..GetMatches with data
-	..GetMatchDetails for each
-	AddMove to first
-	GetMatchDetails for both
-	AddMove to second
-	GetMatchDetails for both
-*/
-
 func TestIntegration(t *testing.T) {
 	server := NewServer()
 
 	getMatchListRequest, _ := http.NewRequest("GET", "/matches", nil)
-	//	addMoveRequest, _ := http.NewRequest("POST", "/matches/{id}/moves", nil)
 
 	firstMatchBody := []byte("{\n  \"gridsize\": 19,\n  \"playerWhite\": \"L'Carpetron Dookmarriott\",\n  \"playerBlack\": \"Hingle McCringleberry\"\n}")
 	secondMatchBody := []byte("{\n  \"gridsize\": 19,\n  \"playerWhite\": \"Devoin Shower-Handel\",\n  \"playerBlack\": \"J'Dinkalage Morgoone\"\n}")
@@ -109,6 +97,92 @@ func TestIntegration(t *testing.T) {
 		t.Errorf("Expected match gridsize to be 19; received %d", firstMatch.GridSize)
 	}
 
+	secondMatch := matches[1]
+
+	recorder = httptest.NewRecorder()
+	requestString := fmt.Sprintf("/matches/%s/moves", firstMatch.ID)
+	matchMove := bytes.NewBuffer([]byte("{\n  \"player\": 2,\n  \"position\": {\n    \"x\": 3,\n    \"y\": 10\n  }\n}"))
+	addMoveRequest, _ := http.NewRequest("POST", requestString, matchMove)
+	server.ServeHTTP(recorder, addMoveRequest)
+	if recorder.Code != 201 {
+		t.Errorf("Error adding move to match: %d", recorder.Code)
+	}
+
+	recorder = httptest.NewRecorder()
+	requestString = fmt.Sprintf("/matches/%s", firstMatch.ID)
+	getMatchDetailsRequest, _ = http.NewRequest("GET", requestString, nil)
+	server.ServeHTTP(recorder, getMatchDetailsRequest)
+	if recorder.Code != 200 {
+		t.Errorf("Error getting match details: %d", recorder.Code)
+	}
+
+	var updatedFirstMatch matchDetailsResponse
+	err = json.Unmarshal(recorder.Body.Bytes(), &updatedFirstMatch)
+	if err != nil {
+		t.Errorf("Error unmarshaling match details: %v", err)
+	}
+	if updatedFirstMatch.GameBoard[3][10] != 2 {
+		t.Errorf("Expected gameboard position 3,10 to be 2, received: %d", updatedFirstMatch.GameBoard[3][10])
+	}
+
+	recorder = httptest.NewRecorder()
+	requestString = fmt.Sprintf("/matches/%s", secondMatch.ID)
+	getMatchDetailsRequest, _ = http.NewRequest("GET", requestString, nil)
+	server.ServeHTTP(recorder, getMatchDetailsRequest)
+	if recorder.Code != 200 {
+		t.Errorf("Error getting match details: %d", recorder.Code)
+	}
+
+	var originalSecondMatch matchDetailsResponse
+	err = json.Unmarshal(recorder.Body.Bytes(), &originalSecondMatch)
+	if err != nil {
+		t.Errorf("Error unmarshaling match details: %v", err)
+	}
+	if originalSecondMatch.GameBoard[3][10] != 0 {
+		t.Errorf("Expected gameboard position 3,10 to be 0, received: %d", originalSecondMatch.GameBoard[3][10])
+	}
+
+	recorder = httptest.NewRecorder()
+	requestString = fmt.Sprintf("/matches/%s/moves", secondMatch.ID)
+	matchMove = bytes.NewBuffer([]byte("{\n  \"player\": 1,\n  \"position\": {\n    \"x\": 3,\n    \"y\": 10\n  }\n}"))
+	addMoveRequest, _ = http.NewRequest("POST", requestString, matchMove)
+	server.ServeHTTP(recorder, addMoveRequest)
+	if recorder.Code != 201 {
+		t.Errorf("Error adding move to match: %d", recorder.Code)
+	}
+
+	recorder = httptest.NewRecorder()
+	requestString = fmt.Sprintf("/matches/%s", firstMatch.ID)
+	getMatchDetailsRequest, _ = http.NewRequest("GET", requestString, nil)
+	server.ServeHTTP(recorder, getMatchDetailsRequest)
+	if recorder.Code != 200 {
+		t.Errorf("Error getting match details: %d", recorder.Code)
+	}
+
+	err = json.Unmarshal(recorder.Body.Bytes(), &updatedFirstMatch)
+	if err != nil {
+		t.Errorf("Error unmarshaling match details: %v", err)
+	}
+	if updatedFirstMatch.GameBoard[3][10] != 2 {
+		t.Errorf("Expected gameboard position 3,10 to be 2, received: %d", updatedFirstMatch.GameBoard[3][10])
+	}
+
+	recorder = httptest.NewRecorder()
+	requestString = fmt.Sprintf("/matches/%s", secondMatch.ID)
+	getMatchDetailsRequest, _ = http.NewRequest("GET", requestString, nil)
+	server.ServeHTTP(recorder, getMatchDetailsRequest)
+	if recorder.Code != 200 {
+		t.Errorf("Error getting match details: %d", recorder.Code)
+	}
+
+	var updatedSecondMatch matchDetailsResponse
+	err = json.Unmarshal(recorder.Body.Bytes(), &updatedSecondMatch)
+	if err != nil {
+		t.Errorf("Error unmarshaling match details: %v", err)
+	}
+	if updatedSecondMatch.GameBoard[3][10] != 1 {
+		t.Errorf("Expected gameboard position 3,10 to be 1, received: %d", updatedSecondMatch.GameBoard[3][10])
+	}
 }
 
 type newMatchResponse struct {

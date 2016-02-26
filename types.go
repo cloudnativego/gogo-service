@@ -11,7 +11,7 @@ type newMatchResponse struct {
 	Turn        int    `json:"turn,omitempty"`
 }
 
-func (m *newMatchResponse) parse(match gogo.Match) {
+func (m *newMatchResponse) copyMatch(match gogo.Match) {
 	m.ID = match.ID
 	m.StartedAt = match.StartTime.Unix()
 	m.GridSize = match.GridSize
@@ -30,7 +30,7 @@ type matchDetailsResponse struct {
 	GameBoard   [][]byte `json:"gameboard"`
 }
 
-func (m *matchDetailsResponse) parse(match gogo.Match) {
+func (m *matchDetailsResponse) copyMatch(match gogo.Match) {
 	m.ID = match.ID
 	m.StartedAt = match.StartTime.Unix()
 	m.GridSize = match.GridSize

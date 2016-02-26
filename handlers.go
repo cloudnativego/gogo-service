@@ -17,7 +17,7 @@ func createMatchHandler(formatter *render.Render, repo matchRepository) http.Han
 		var newMatchRequest newMatchRequest
 		err := json.Unmarshal(payload, &newMatchRequest)
 		if err != nil {
-			formatter.Text(w, http.StatusBadRequest, "Failed to parse create match request")
+			formatter.Text(w, http.StatusBadRequest, "Failed to parse match request")
 			return
 		}
 		if !newMatchRequest.isValid() {
@@ -28,7 +28,7 @@ func createMatchHandler(formatter *render.Render, repo matchRepository) http.Han
 		newMatch := gogo.NewMatch(newMatchRequest.GridSize, newMatchRequest.PlayerBlack, newMatchRequest.PlayerWhite)
 		repo.addMatch(newMatch)
 		var mr newMatchResponse
-		mr.parse(newMatch)
+		mr.copyMatch(newMatch)
 		w.Header().Add("Location", "/matches/"+newMatch.ID)
 		formatter.JSON(w, http.StatusCreated, &mr)
 	}
@@ -40,7 +40,7 @@ func getMatchListHandler(formatter *render.Render, repo matchRepository) http.Ha
 		if err == nil {
 			matches := make([]newMatchResponse, len(repoMatches))
 			for idx, match := range repoMatches {
-				matches[idx].parse(match)
+				matches[idx].copyMatch(match)
 			}
 			formatter.JSON(w, http.StatusOK, matches)
 		} else {
@@ -58,7 +58,7 @@ func getMatchDetailsHandler(formatter *render.Render, repo matchRepository) http
 			formatter.JSON(w, http.StatusNotFound, err.Error())
 		} else {
 			var mdr matchDetailsResponse
-			mdr.parse(match)
+			mdr.copyMatch(match)
 			formatter.JSON(w, http.StatusOK, &mdr)
 		}
 	}
@@ -76,12 +76,19 @@ func addMoveHandler(formatter *render.Render, repo matchRepository) http.Handler
 			var moveRequest newMoveRequest
 			err := json.Unmarshal(payload, &moveRequest)
 			newBoard, err := match.GameBoard.PerformMove(gogo.Move{Player: moveRequest.Player, Position: gogo.Coordinate{X: moveRequest.Position.X, Y: moveRequest.Position.Y}})
-			// TODO - this only works because we're using an in-memory repository. A stateless external one
-			// would need another call here to persist changes to the match.
 			if err != nil {
+				formatter.JSON(w, http.StatusBadRequest, err.Error())
+			} else {
 				match.GameBoard = newBoard
+				err = repo.updateMatch(matchID, match)
+				if err != nil {
+					formatter.JSON(w, http.StatusInternalServerError, err.Error())
+				} else {
+					var mdr matchDetailsResponse
+					mdr.copyMatch(match)
+					formatter.JSON(w, http.StatusCreated, &mdr)
+				}
 			}
-			formatter.JSON(w, http.StatusCreated, matchDetailsResponse{ID: matchID, GameBoard: match.GameBoard.Positions})
 		}
 	}
 }
