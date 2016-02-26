@@ -9,6 +9,10 @@ build:
     - setup-go-workspace
 
     - script:
+        name: disable vendoring
+        code: |
+          export GO15VENDOREXPERIMENT=0
+    - script:
         name: go get
         code: |
           cd $WERCKER_SOURCE_DIR
