@@ -12,14 +12,13 @@ import (
 )
 
 var (
-	server = NewServer()
+	server          = NewServer()
+	firstMatchBody  = []byte("{\n  \"gridsize\": 19,\n  \"playerWhite\": \"L'Carpetron Dookmarriott\",\n  \"playerBlack\": \"Hingle McCringleberry\"\n}")
+	secondMatchBody = []byte("{\n  \"gridsize\": 19,\n  \"playerWhite\": \"Devoin Shower-Handel\",\n  \"playerBlack\": \"J'Dinkalage Morgoone\"\n}")
 )
 
 func TestIntegration(t *testing.T) {
-
-	firstMatchBody := []byte("{\n  \"gridsize\": 19,\n  \"playerWhite\": \"L'Carpetron Dookmarriott\",\n  \"playerBlack\": \"Hingle McCringleberry\"\n}")
-	secondMatchBody := []byte("{\n  \"gridsize\": 19,\n  \"playerWhite\": \"Devoin Shower-Handel\",\n  \"playerBlack\": \"J'Dinkalage Morgoone\"\n}")
-
+	// Get empty match list
 	emptyMatches, err := getMatchList(t)
 	if len(emptyMatches) > 0 {
 		t.Errorf("Expected get match list to return an empty array; received %d", len(emptyMatches))
