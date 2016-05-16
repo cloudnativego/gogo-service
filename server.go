@@ -13,7 +13,7 @@ import (
 )
 
 // NewServer configures and returns a Server.
-func NewServer() *negroni.Negroni {
+func NewServer(appEnv *cfenv.App) *negroni.Negroni {
 
 	formatter := render.New(render.Options{
 		IndentJSON: true,
@@ -22,7 +22,7 @@ func NewServer() *negroni.Negroni {
 	n := negroni.Classic()
 	mx := mux.NewRouter()
 
-	repo := initRepository()
+	repo := initRepository(appEnv)
 
 	initRoutes(mx, formatter, repo)
 
@@ -45,8 +45,7 @@ func testHandler(formatter *render.Render) http.HandlerFunc {
 	}
 }
 
-func initRepository() (repo matchRepository) {
-	appEnv, _ := cfenv.Current()
+func initRepository(appEnv *cfenv.App) (repo matchRepository) {
 	dbServiceURI, err := cftools.GetVCAPServiceProperty(dbServiceName, "url", appEnv)
 	if err != nil || dbServiceURI == "" {
 		if err != nil {

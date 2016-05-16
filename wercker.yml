@@ -9,23 +9,20 @@ build:
     - setup-go-workspace
 
     - script:
-        name: disable vendoring
-        code: |
-          export GO15VENDOREXPERIMENT=0
-    - script:
         name: go get
         code: |
           cd $WERCKER_SOURCE_DIR
           go version
-          go get -u github.com/tools/godep
+          go get -u github.com/Masterminds/glide
           go get -u github.com/cloudnativego/cf-tools/vcapinate
           export PATH=$WERCKER_SOURCE_DIR/bin:$PATH
+          glide install
 
     # Build the project
     - script:
         name: go build
         code: |
-          godep go build
+          go build
 
     - script:
         name: env
@@ -35,14 +32,14 @@ build:
     - script:
         name: go test
         code: |
-          godep go test -v ./...
+          go test -v $(glide novendor)
 
     - script:
         name: integration tests
         code: |
           export VCAP_SERVICES=`vcapinate -path=./integrations/vcap.yml`
           export VCAP_APPLICATION={}
-          godep go test ./integrations/_test -v -race
+          go test ./integrations/_test -v -race
 
     - script:
         name: copy files to wercker output
@@ -56,6 +53,6 @@ deploy:
        password: $PASSWORD
        cmd: /pipeline/source/gogo-service
        port: "8080"
-       tag: v1
+       tag: latest
        repository: cloudnativego/gogo-service
        registry: https://registry.hub.docker.com

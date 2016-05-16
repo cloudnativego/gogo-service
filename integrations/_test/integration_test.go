@@ -8,11 +8,13 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/cloudfoundry-community/go-cfenv"
 	. "github.com/cloudnativego/gogo-service"
 )
 
 var (
-	server          = NewServer()
+	appEnv, _       = cfenv.Current()
+	server          = NewServer(appEnv)
 	firstMatchBody  = []byte("{\n  \"gridsize\": 19,\n  \"playerWhite\": \"L'Carpetron Dookmarriott\",\n  \"playerBlack\": \"Hingle McCringleberry\"\n}")
 	secondMatchBody = []byte("{\n  \"gridsize\": 19,\n  \"playerWhite\": \"Devoin Shower-Handel\",\n  \"playerBlack\": \"J'Dinkalage Morgoone\"\n}")
 )

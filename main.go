@@ -1,6 +1,10 @@
 package main
 
-import "os"
+import (
+	"os"
+
+	"github.com/cloudfoundry-community/go-cfenv"
+)
 
 func main() {
 	port := os.Getenv("PORT")
@@ -8,6 +12,7 @@ func main() {
 		port = "3000"
 	}
 
-	server := NewServer()
+	appEnv, _ := cfenv.Current()
+	server := NewServer(appEnv)
 	server.Run(":" + port)
 }
