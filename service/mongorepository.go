@@ -1,4 +1,4 @@
-package main
+package service
 
 import (
 	"errors"
@@ -42,9 +42,9 @@ func (r *mongoMatchRepository) addMatch(match gogo.Match) (err error) {
 
 func (r *mongoMatchRepository) getMatch(id string) (match gogo.Match, err error) {
 	r.Collection.Wake()
-	matchRecord, err := r.getMongoMatch(id)
+	theMatch, err := r.getMongoMatch(id)
 	if err == nil {
-		match = convertMatchRecordToMatch(matchRecord)
+		match = convertMatchRecordToMatch(theMatch)
 	}
 	return
 }

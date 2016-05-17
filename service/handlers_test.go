@@ -1,4 +1,4 @@
-package main
+package service
 
 import (
 	"bytes"
@@ -55,7 +55,7 @@ func CreateMatchRespondsToBadData(t *testing.T) {
 		t.Errorf("Error in creating second POST request for invalid data on create match: %v", err2)
 	}
 	req2.Header.Add("Content-Type", "application/json")
-	res2, err2 := client.Do(req2)
+	res2, _ := client.Do(req2)
 	defer res2.Body.Close()
 	if res2.StatusCode != http.StatusBadRequest {
 		t.Error("Sending valid JSON but with incorrect or missing fields should result in a bad request and didn't.")

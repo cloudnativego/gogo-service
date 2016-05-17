@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/cloudfoundry-community/go-cfenv"
-	. "github.com/cloudnativego/gogo-service"
+	. "github.com/cloudnativego/gogo-service/service"
 )
 
 var (
@@ -79,19 +79,19 @@ func TestIntegration(t *testing.T) {
 		t.Errorf("Expected gameboard position 3,10 to be 2, received: %d", updatedFirstMatch.GameBoard[3][10])
 	}
 
-	originalSecondMatch, err := getMatchDetails(t, secondMatch.ID)
+	originalSecondMatch, _ := getMatchDetails(t, secondMatch.ID)
 	if originalSecondMatch.GameBoard[3][10] != 0 {
 		t.Errorf("Expected gameboard position 3,10 to be 0, received: %d", originalSecondMatch.GameBoard[3][10])
 	}
 
 	addMoveToMatch(t, secondMatch.ID, []byte("{\n  \"player\": 1,\n  \"position\": {\n    \"x\": 3,\n    \"y\": 10\n  }\n}"))
 
-	updatedFirstMatch, err = getMatchDetails(t, firstMatch.ID)
+	updatedFirstMatch, _ = getMatchDetails(t, firstMatch.ID)
 	if updatedFirstMatch.GameBoard[3][10] != 2 {
 		t.Errorf("Expected gameboard position 3,10 to be 2, received: %d", updatedFirstMatch.GameBoard[3][10])
 	}
 
-	updatedSecondMatch, err := getMatchDetails(t, secondMatch.ID)
+	updatedSecondMatch, _ := getMatchDetails(t, secondMatch.ID)
 	if updatedSecondMatch.GameBoard[3][10] != 1 {
 		t.Errorf("Expected gameboard position 3,10 to be 1, received: %d", updatedSecondMatch.GameBoard[3][10])
 	}

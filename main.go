@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/cloudfoundry-community/go-cfenv"
+	service "github.com/cloudnativego/gogo-service/service"
 )
 
 func main() {
@@ -13,6 +14,6 @@ func main() {
 	}
 
 	appEnv, _ := cfenv.Current()
-	server := NewServer(appEnv)
+	server := service.NewServer(appEnv)
 	server.Run(":" + port)
 }
