@@ -53,6 +53,7 @@ func initRepository(appEnv *cfenv.App) (repo matchRepository) {
 		}
 		fmt.Println("MongoDB was not detected; configuring inMemoryRepository...")
 		repo = newInMemoryRepository()
+		return
 	}
 	matchCollection := cfmgo.Connect(cfmgo.NewCollectionDialer, dbServiceURI, MatchesCollectionName)
 	fmt.Printf("Connecting to MongoDB service: %s...\n", dbServiceName)
