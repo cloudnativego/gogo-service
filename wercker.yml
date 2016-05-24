@@ -32,7 +32,7 @@ build:
     - script:
         name: go test
         code: |
-          go test -v ./service $(glide novendor)
+          go test -v ./service
 
     - script:
         name: integration tests
